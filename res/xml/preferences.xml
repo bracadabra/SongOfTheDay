@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <ListPreference
+        android:defaultValue="@string/wifi_value"
+        android:entries="@array/connectivity_entries"
+        android:entryValues="@array/connectivity_values"
+        android:key="@string/network_type_key"
+        android:summary="@string/network_type_summary"
+        android:title="@string/network_type_title" />
+
+</PreferenceScreen>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:padding="7dip" >
+
+    <ImageView
+        android:id="@+id/download_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:contentDescription="@string/icon_content_discription"
+        android:gravity="center_horizontal"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:paddingTop="3dp"
+        android:src="@android:drawable/stat_sys_download" />
+
+    <TextView
+        android:id="@+id/percentage"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/download_icon"
+        android:gravity="center"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:textAppearance="@android:style/TextAppearance.Small"
+        android:textColor="?android:textColorPrimary" />
+
+    <TextView
+        android:id="@+id/songTitle"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/download_cancel"
+        android:layout_toRightOf="@id/download_icon"
+        android:fadingEdge="horizontal"
+        android:fadingEdgeLength="7dip"
+        android:paddingBottom="3dp"
+        android:paddingRight="15dp"
+        android:paddingTop="3dp"
+        android:singleLine="true"
+        android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent.Title" />
+
+    <ProgressBar
+        android:id="@+id/status_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/songTitle"
+        android:layout_toLeftOf="@id/download_cancel"
+        android:layout_toRightOf="@id/percentage"
+        android:indeterminate="false"
+        android:indeterminateOnly="false"
+        android:paddingRight="15dp" />
+
+    <ImageView
+        android:id="@+id/download_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:contentDescription="@string/icon_content_discription"
+        android:paddingLeft="5dp"
+        android:paddingRight="10dp"
+        android:paddingTop="3dp"
+        android:src="@drawable/ic_clear_normal" />
+
+</RelativeLayout>

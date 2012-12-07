@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, SongOfTheDayActivity!</string>
+    <string name="app_name">SongOfTheDay</string>
+    <string name="not_found">Nothing was found</string>
+    <string name="icon_content_discription">Download icon</string>
+    <string name="downloading_started">Song of the day is downloading&#8230;</string>
+    <string name="email">E-mail</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="exception">Terrible thing happened</string>
+    <string name="authentication_failed">Authentication failed!</string>
+    <string name="network_unavailable">Network unavailable</string>
+    <string name="sdcard_busy_title">SD card unavailable</string>
+    <string name="sdcard_busy_title_nosdcard">USB storage unavailable</string>
+    <string name="sdcard_missing_title">No SD card</string>
+    <string name="sdcard_missing_title_nosdcard">No USB storage</string>
+    <string name="toast_add">Song has been added!</string>
+    <string name="toast_error">Some error occurs!</string>
+
+    <!-- Content description -->
+    <string name="desc_preference">Settings</string>
+    <string name="desc_play_stop">Play/Stop</string>
+    <string name="desc_update">Update</string>
+    <string name="desc_add">Add</string>
+    <string name="desc_divider">Divider</string>
+
+    <!-- Preferences -->
+    <string name="network_type_key">network_key</string>
+    <string name="network_type_title">Network Type</string>
+    <string name="network_type_summary">Required network connectivity required to download the song</string>
+    <string name="network_wifi">Wi-Fi</string>
+    <string name="network_any">Any</string>
+    <string name="wifi_value">0</string>
+    <string name="any_value">1</string>
+
+</resources>

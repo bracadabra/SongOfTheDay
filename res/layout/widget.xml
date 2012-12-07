@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="0dp"
+        android:orientation="horizontal"
+        android:padding="0dp" >
+
+        <ImageButton
+            android:id="@+id/preference"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_l"
+            android:padding="0dp"
+            android:src="@drawable/preference"
+            android:contentDescription="@string/desc_preference" />
+
+        <ImageView
+            android:layout_width="1dip"
+            android:layout_height="match_parent"
+            android:background="#AAab0000"
+            android:contentDescription="@string/desc_divider" />
+
+        <ImageButton
+            android:id="@+id/play"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_m"
+            android:padding="0dp"
+            android:src="@drawable/play"
+            android:contentDescription="@string/desc_play_stop" />
+
+        <ImageView
+            android:layout_width="1dip"
+            android:layout_height="match_parent"
+            android:background="#AAab0000"
+            android:contentDescription="@string/desc_divider" />
+
+        <ImageButton
+            android:id="@+id/update"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_m"
+            android:padding="0dp"
+            android:src="@drawable/update"
+            android:contentDescription="@string/desc_update" />
+
+        <ImageView
+            android:layout_width="1dip"
+            android:layout_height="match_parent"
+            android:background="#AAab0000"
+            android:contentDescription="@string/desc_divider" />
+
+        <ImageButton
+            android:id="@+id/add"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_r"
+            android:padding="0dp"
+            android:src="@drawable/add"
+            android:contentDescription="@string/desc_add" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_info_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/text_shape"
+        android:gravity="center_vertical"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip"
+            android:ellipsize="none"           
+            android:gravity="center_horizontal"
+            android:lines="2"      
+            android:textColor="#BB000000"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/artist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip"
+            android:ellipsize="none"   
+            android:gravity="center_horizontal"
+            android:lines="2"           
+            android:textColor="#BB000000"
+            android:textSize="20sp" />
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/progressbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/text_shape"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            style="?android:attr/progressBarStyleInverse"/>
+    </LinearLayout>
+
+</LinearLayout>

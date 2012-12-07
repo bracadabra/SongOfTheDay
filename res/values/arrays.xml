@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="connectivity_entries">
+        <item>@string/network_wifi</item>
+        <item>@string/network_any</item>
+    </string-array>
+    <string-array name="connectivity_values">
+        <item>@string/wifi_value</item>
+        <item>@string/any_value</item>
+    </string-array>
+
+</resources>
