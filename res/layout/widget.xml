@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="10dp" >
 
     <LinearLayout
+        android:id="@+id/buttons_container"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_margin="0dp"
@@ -19,9 +20,9 @@
             android:layout_margin="0dp"
             android:layout_weight="1"
             android:background="@drawable/button_l"
+            android:contentDescription="@string/desc_preference"
             android:padding="0dp"
-            android:src="@drawable/preference"
-            android:contentDescription="@string/desc_preference" />
+            android:src="@drawable/preference" />
 
         <ImageView
             android:layout_width="1dip"
@@ -36,9 +37,9 @@
             android:layout_margin="0dp"
             android:layout_weight="1"
             android:background="@drawable/button_m"
+            android:contentDescription="@string/desc_play_stop"
             android:padding="0dp"
-            android:src="@drawable/play"
-            android:contentDescription="@string/desc_play_stop" />
+            android:src="@drawable/play" />
 
         <ImageView
             android:layout_width="1dip"
@@ -53,9 +54,9 @@
             android:layout_margin="0dp"
             android:layout_weight="1"
             android:background="@drawable/button_m"
+            android:contentDescription="@string/desc_update"
             android:padding="0dp"
-            android:src="@drawable/update"
-            android:contentDescription="@string/desc_update" />
+            android:src="@drawable/update" />
 
         <ImageView
             android:layout_width="1dip"
@@ -70,15 +71,16 @@
             android:layout_margin="0dp"
             android:layout_weight="1"
             android:background="@drawable/button_r"
+            android:contentDescription="@string/desc_add"
             android:padding="0dp"
-            android:src="@drawable/add"
-            android:contentDescription="@string/desc_add" />
+            android:src="@drawable/add" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/widget_info_container"
+        android:id="@+id/details_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/buttons_container"
         android:background="@drawable/text_shape"
         android:gravity="center_vertical"
         android:orientation="vertical" >
@@ -89,9 +91,9 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dip"
             android:layout_marginRight="10dip"
-            android:ellipsize="none"           
+            android:ellipsize="none"
             android:gravity="center_horizontal"
-            android:lines="2"      
+            android:lines="2"
             android:textColor="#BB000000"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -102,27 +104,37 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dip"
             android:layout_marginRight="10dip"
-            android:ellipsize="none"   
+            android:ellipsize="none"
             android:gravity="center_horizontal"
-            android:lines="2"           
+            android:lines="2"
             android:textColor="#BB000000"
             android:textSize="20sp" />
     </LinearLayout>
-    
+
     <LinearLayout
         android:id="@+id/progressbar_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/buttons_container"
         android:background="@drawable/text_shape"
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="gone" >
 
         <ProgressBar
+            style="?android:attr/progressBarStyleInverse"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:indeterminate="true"
-            style="?android:attr/progressBarStyleInverse"/>
+            android:indeterminate="true" />
     </LinearLayout>
+    
+    <ImageView 
+        android:id="@+id/widget_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/desc_info"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/ic_menu_info_details"/>
 
-</LinearLayout>
+</RelativeLayout>

@@ -8,7 +8,7 @@
         android:minSdkVersion="9"
         android:targetSdkVersion="16" />
 
-    <uses-permission android:name="android.permission.INTERNET" />    
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -18,15 +18,20 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
         <activity
-            android:name="ru.vang.songoftheday.VkAuthActivity"
+            android:name=".activity.VkAuthActivity"
             android:excludeFromRecents="true" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
         <activity
-            android:name="ru.vang.songoftheday.WidgetPreferenceActivity"
+            android:name=".activity.WidgetPreferenceActivity"
             android:excludeFromRecents="true" >
+        </activity>
+        <activity
+            android:name=".activity.WidgetUpdateInfoActivity"
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Dialog" >
         </activity>
 
         <receiver android:name=".SongOfTheDayWidget" >

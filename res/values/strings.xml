@@ -25,6 +25,7 @@
     <string name="desc_update">Update</string>
     <string name="desc_add">Add</string>
     <string name="desc_divider">Divider</string>
+    <string name="desc_info">Widget Info</string>
 
     <!-- Preferences -->
     <string name="network_type_key">network_key</string>
@@ -34,5 +35,8 @@
     <string name="network_any">Any</string>
     <string name="wifi_value">0</string>
     <string name="any_value">1</string>
-
+    
+    <!-- Widget update info activity -->
+    <string name="original_title">Original title:</string>
+    <string name="original_artist">Original artist:</string>
 </resources>

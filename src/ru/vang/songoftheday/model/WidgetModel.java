@@ -5,7 +5,8 @@ import java.util.Calendar;
 import ru.vang.songoftheday.MediaPlayerService;
 import ru.vang.songoftheday.R;
 import ru.vang.songoftheday.SongOfTheDayWidget;
-import ru.vang.songoftheday.WidgetPreferenceActivity;
+import ru.vang.songoftheday.activity.WidgetUpdateInfoActivity;
+import ru.vang.songoftheday.activity.WidgetPreferenceActivity;
 import ru.vang.songoftheday.api.VkTrack;
 import ru.vang.songoftheday.util.Logger;
 import android.app.AlarmManager;
@@ -25,10 +26,12 @@ public class WidgetModel {
 	public static final String ACTION_ADD = "ru.vang.songoftheday.ACTION_ADD";
 	public static final String ACTION_CANCEL = "ru.vang.songoftheday.ACTION_CANCEL"; 
 	public static final String DATE_PATTERN = "dd-MM-yyyy hh:mm:ss a";
-	public static final String EXTRA_ARTIST = "artsist";
-	public static final String EXTRA_TITLE = "title";
-	public static final String EXTRA_AID = "aid";
-	public static final String EXTRA_OID = "oid";
+	public static final String EXTRA_ORIGINAL_ARTIST = "ru.vang.songoftheday.originalArtsist";
+	public static final String EXTRA_ORIGINAL_TITLE = "ru.vang.songoftheday.originalTitle";
+	public static final String EXTRA_ARTIST = "ru.vang.songoftheday.artsist";
+	public static final String EXTRA_TITLE = "ru.vang.songoftheday.title";
+	public static final String EXTRA_AID = "ru.vang.songoftheday.aid";
+	public static final String EXTRA_OID = "ru.vang.songoftheday.oid";
 	public static final long EXTRA_INVALID_ID = -1;
 	private static final String EMPTY_STRING = "";
 
@@ -74,8 +77,7 @@ public class WidgetModel {
 	}
 
 	public void bindPlay(final String artist, final String title, final Uri path, final long aid, final long oid,
-			final boolean isPlaying) {
-		final ComponentName serviceName = new ComponentName(mContext, MediaPlayerService.class);
+			final boolean isPlaying) {		
 		String action;
 		if (isPlaying) {
 			mRemoteViews.setImageViewResource(R.id.play, R.drawable.stop);
@@ -86,6 +88,7 @@ public class WidgetModel {
 		}
 
 		final Intent intent = new Intent(action);
+		final ComponentName serviceName = new ComponentName(mContext, MediaPlayerService.class);
 		intent.setComponent(serviceName);
 		intent.setData(path);
 		intent.putExtra(EXTRA_ARTIST, artist);
@@ -94,6 +97,23 @@ public class WidgetModel {
 		intent.putExtra(EXTRA_OID, oid);
 		final PendingIntent pendingIntent = PendingIntent.getService(mContext, 0, intent, 0);
 		mRemoteViews.setOnClickPendingIntent(R.id.play, pendingIntent);
+	}
+	
+	public void bindInfo(final String originalArtist, final String originalTitle, final String artist, final String title) {
+		final Intent intent = new Intent(mContext, WidgetUpdateInfoActivity.class);		
+		intent.putExtra(EXTRA_ORIGINAL_ARTIST, originalArtist);
+		intent.putExtra(EXTRA_ORIGINAL_TITLE, originalTitle);
+		intent.putExtra(EXTRA_ARTIST, artist);
+		intent.putExtra(EXTRA_TITLE, title);
+		final PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		mRemoteViews.setOnClickPendingIntent(R.id.widget_info, pendingIntent);
+	}
+	
+	private void bindButtons(final String artist, final String title, final Uri path, final long aid, final long oid, final boolean isPlaing) {
+		bindPreference();
+		bindPlay(artist, title, path, aid, oid, isPlaing);
+		bindAdd(aid, oid);
+		bindUpdate();
 	}
 
 	public void tooglePlay(final Context context, final Intent intent, final boolean isPlaing) {
@@ -112,24 +132,17 @@ public class WidgetModel {
 		final long oid = intent.getLongExtra(EXTRA_OID, EXTRA_INVALID_ID);
 		bindButtons(artist, title, path, aid, oid, isPlaing);		
 		mManager.updateAppWidget(mComponentName, mRemoteViews);
-	}
-	
-	private void bindButtons(final String artist, final String title, final Uri path, final long aid, final long oid, final boolean isPlaing) {
-		bindPreference();
-		bindPlay(artist, title, path, aid, oid, isPlaing);
-		bindAdd(aid, oid);
-		bindUpdate();
-	}
+	}	
 
 	public void showProgressBar() {
 		mRemoteViews.setViewVisibility(R.id.progressbar_container, View.VISIBLE);
-		mRemoteViews.setViewVisibility(R.id.widget_info_container, View.GONE);
+		mRemoteViews.setViewVisibility(R.id.details_container, View.GONE);
 		mManager.updateAppWidget(mComponentName, mRemoteViews);
 	}
 	
 	public void hideProgressBar() {
 		mRemoteViews.setViewVisibility(R.id.progressbar_container, View.GONE);
-		mRemoteViews.setViewVisibility(R.id.widget_info_container, View.VISIBLE);
+		mRemoteViews.setViewVisibility(R.id.details_container, View.VISIBLE);
 		mManager.updateAppWidget(mComponentName, mRemoteViews);
 	}
 
@@ -176,6 +189,6 @@ public class WidgetModel {
 	}
 	
 	public void setOnClickEvent(final int viewId, final PendingIntent pendingIntent) {
-		mRemoteViews.setOnClickPendingIntent(R.id.widget_info_container, pendingIntent);
+		mRemoteViews.setOnClickPendingIntent(viewId, pendingIntent);
 	}
 }

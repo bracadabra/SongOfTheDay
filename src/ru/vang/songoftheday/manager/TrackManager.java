@@ -12,6 +12,7 @@ import ru.vang.songoftheday.api.Track;
 import ru.vang.songoftheday.api.Vk;
 import ru.vang.songoftheday.api.VkTrack;
 import ru.vang.songoftheday.exceptions.VkApiException;
+import ru.vang.songoftheday.model.WidgetUpdateInfo;
 import android.content.Context;
 import android.database.Cursor;
 
@@ -66,19 +67,26 @@ public class TrackManager {
 		return track;
 	}
 	
-	public VkTrack findTopTrack() throws VkApiException, ClientProtocolException, IOException, JSONException {
+	
+	
+	public WidgetUpdateInfo findTopTrackInfo() throws VkApiException, ClientProtocolException, IOException, JSONException {
+		final WidgetUpdateInfo widgetInfo = new WidgetUpdateInfo();
 		VkTrack vkTrack = null;
 		do {
 			final Track track = getTopTrack();
 			if (track != null) {
+				widgetInfo.setOriginalArtist(track.getArtist());
+				widgetInfo.setOriginalTitle(track.getTitle());
 				vkTrack = getVkTrack(track.getArtist(), track.getTitle());
 			}
 		} while (vkTrack == null);
+		widgetInfo.setVkTrack(vkTrack);
 		
-		return vkTrack;
+		return widgetInfo;
 	}
 	
-	public VkTrack findSimilarTrack(final Cursor cursor) throws VkApiException, ClientProtocolException, IOException, JSONException {
+	public WidgetUpdateInfo findSimilarTrackInfo(final Cursor cursor) throws VkApiException, ClientProtocolException, IOException, JSONException {
+		final WidgetUpdateInfo widgetInfo = new WidgetUpdateInfo();
 		VkTrack vkTrack = null;
 		final int count = cursor.getCount();
 		final Random random = new Random(System.currentTimeMillis());
@@ -88,13 +96,16 @@ public class TrackManager {
 			cursor.moveToPosition(position);
 			final String originalTitle = cursor.getString(MEDIA_TITLE_INDEX);
 			final String originalArtist = cursor.getString(MEDIA_ARTIST_INDEX);
+			widgetInfo.setOriginalArtist(originalArtist);
+			widgetInfo.setOriginalTitle(originalTitle);
 			final Track track  = getLastFmTrack(originalArtist, originalTitle);
 			if (track != null) {
 				vkTrack = getVkTrack(track.getArtist(), track.getTitle());
 			}
 			index++;
 		} while (vkTrack == null && index < count);
+		widgetInfo.setVkTrack(vkTrack);
 		
-		return vkTrack;
+		return widgetInfo;
 	}
 }

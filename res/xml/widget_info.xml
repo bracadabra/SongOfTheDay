@@ -4,5 +4,5 @@
     android:minHeight="144dp"
     android:updatePeriodMillis="0"
     android:initialLayout="@layout/widget"
-    android:configure="ru.vang.songoftheday.VkAuthActivity">    
+    android:configure="ru.vang.songoftheday.activity.VkAuthActivity">    
 </appwidget-provider>

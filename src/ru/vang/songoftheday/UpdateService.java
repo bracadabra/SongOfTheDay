@@ -13,11 +13,13 @@ import java.util.Date;
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 
+import ru.vang.songoftheday.activity.VkAuthActivity;
 import ru.vang.songoftheday.api.Vk;
 import ru.vang.songoftheday.api.VkTrack;
 import ru.vang.songoftheday.exceptions.UpdateException;
 import ru.vang.songoftheday.exceptions.VkApiException;
 import ru.vang.songoftheday.manager.TrackManager;
+import ru.vang.songoftheday.model.WidgetUpdateInfo;
 import ru.vang.songoftheday.model.WidgetModel;
 import ru.vang.songoftheday.util.DownloadHelper;
 import ru.vang.songoftheday.util.DownloadHelper.ProgressListener;
@@ -45,10 +47,10 @@ public class UpdateService extends IntentService {
 	private static final String TAG = UpdateService.class.getSimpleName();
 
 	private static final String EMPTY = "";
-	private static final String[] MEDIA_PROJECTION = { Media._ID, Media.ARTIST, Media.TITLE };	
+	private static final String[] MEDIA_PROJECTION = { Media._ID, Media.ARTIST, Media.TITLE };
 
 	private static final String AUDIO_SELECTION = Media.IS_MUSIC + "!=0";
-	
+
 	public static boolean sIsCancelled = false;
 
 	private transient final Handler mMainHandler = new Handler();
@@ -87,24 +89,24 @@ public class UpdateService extends IntentService {
 		return errorState;
 	}
 
-	private VkTrack fetchTrack() throws ClientProtocolException, IOException, JSONException, VkApiException {
+	private WidgetUpdateInfo fetchUpdate() throws ClientProtocolException, IOException, JSONException, VkApiException {
 		final Cursor cursor = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, MEDIA_PROJECTION, AUDIO_SELECTION,
 				null, null);
-		final TrackManager manager = new TrackManager(getApplicationContext());		
-		VkTrack vkTrack = null;		
+		final TrackManager manager = new TrackManager(getApplicationContext());
+		WidgetUpdateInfo widgetInfo = null;
 		if (cursor == null) {
-			vkTrack = manager.findTopTrack();
+			widgetInfo = manager.findTopTrackInfo();
 		} else {
-			vkTrack = manager.findSimilarTrack(cursor);
+			widgetInfo = manager.findSimilarTrackInfo(cursor);
 			cursor.close();
 		}
 
-		if (vkTrack != null) {			
-			final String path = downloadTrack(vkTrack);
-			vkTrack.setPath(path);
-		}		
+		if (widgetInfo.getVkTrack() != null) {
+			final String path = downloadTrack(widgetInfo.getVkTrack());
+			widgetInfo.setPath(path);
+		}
 
-		return vkTrack;
+		return widgetInfo;
 	}
 
 	private String downloadTrack(final VkTrack vkTrack) throws ClientProtocolException, IOException {
@@ -121,12 +123,12 @@ public class UpdateService extends IntentService {
 	}
 
 	@Override
-	protected void onHandleIntent(final Intent intent) {		
+	protected void onHandleIntent(final Intent intent) {
 		final SharedPreferences sharedPreferences = getSharedPreferences(Settings.SHARED_PREF_NAME, Context.MODE_PRIVATE);
 		if (!sharedPreferences.getBoolean(Settings.PREF_KEY_COMPLETED, false)) {
 			return;
 		}
-		
+
 		final String action = intent.getAction();
 		if (ACTION_UPDATE.equals(action)) {
 			sIsCancelled = false;
@@ -181,28 +183,31 @@ public class UpdateService extends IntentService {
 	private void buildUpdate(final WidgetModel widget) {
 		final Context context = getApplicationContext();
 		try {
-			final VkTrack track = fetchTrack();
-			if (track == null) {
+			final WidgetUpdateInfo widgetInfo = fetchUpdate();
+			if (widgetInfo.getVkTrack() == null) {
 				widget.setWidgetText(R.string.not_found);
 			} else {
-				widget.setWidgetText(track.getTitle(), track.getArtist());
-				widget.bindPlay(track);
-				widget.bindAdd(track.getId(), track.getOwnerId());
+				final VkTrack vkTrack = widgetInfo.getVkTrack();
+				widget.setWidgetText(vkTrack.getTitle(), vkTrack.getArtist());
+				widget.bindPlay(vkTrack);
+				widget.bindAdd(vkTrack.getId(), vkTrack.getOwnerId());
+				widget.bindInfo(widgetInfo.getOriginalArtist(), widgetInfo.getOriginalTitle(), vkTrack.getArtist(),
+						vkTrack.getTitle());
 			}
 		} catch (ClientProtocolException e) {
 			Log.e(TAG, Log.getStackTraceString(e));
 			widget.setWidgetText(R.string.exception);
-			
+
 			Logger.debug(TAG, "ClientProtocolException");
 		} catch (IOException e) {
 			Log.e(TAG, Log.getStackTraceString(e));
 			widget.setWidgetText(R.string.exception);
-			
+
 			Logger.debug(TAG, "IOException");
 		} catch (JSONException e) {
 			Log.e(TAG, Log.getStackTraceString(e));
 			widget.setWidgetText(R.string.exception);
-			
+
 			Logger.debug(TAG, "JSONException");
 		} catch (VkApiException e) {
 			Log.e(TAG, Log.getStackTraceString(e));
@@ -211,12 +216,12 @@ public class UpdateService extends IntentService {
 			final Intent intent = new Intent(context, VkAuthActivity.class);
 			final PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent,
 					PendingIntent.FLAG_UPDATE_CURRENT);
-			widget.setOnClickEvent(R.id.widget_info_container, pendingIntent);
-			
+			widget.setOnClickEvent(R.id.details_container, pendingIntent);
+
 			Logger.debug(TAG, "VkApiException");
 		} catch (UpdateException e) {
 			widget.setWidgetText(e.getMessage());
-			
+
 			Log.e(TAG, Log.getStackTraceString(e));
 			Logger.debug(TAG, "UpdateException");
 		}
