@@ -27,17 +27,17 @@ public final class LastFM {
 	private LastFM() {
 	}
 
-	public static List<Track> getSimilarTracks(final String artist, final String title) throws ClientProtocolException,
+	public static List<LastFmTrack> getSimilarTracks(final String artist, final String title) throws ClientProtocolException,
 			IOException {
 		final String url = String.format(GET_SIMILAR, URLEncoder.encode(artist), URLEncoder.encode(title));
 		return makeRequest(url, "similartracks");
 	}
 
-	public static List<Track> getTopTracks() throws ClientProtocolException, IOException {
+	public static List<LastFmTrack> getTopTracks() throws ClientProtocolException, IOException {
 		return makeRequest(GET_TOP_TRACKS, "tracks");
 	}
 
-	private static List<Track> makeRequest(final String url, final String root) throws ClientProtocolException, IOException {
+	private static List<LastFmTrack> makeRequest(final String url, final String root) throws ClientProtocolException, IOException {
 		Logger.debug(TAG, "Requested url: " + url);
 		final HttpGet get = new HttpGet(url);
 
@@ -51,7 +51,7 @@ public final class LastFM {
 			throw new UpdateException("Unable to connect to LastFM! code: " + response.getStatusLine().getStatusCode());
 		}
 		final BufferedInputStream bufferedStream = new BufferedInputStream(response.getEntity().getContent());
-		final List<Track> tracks = ResponseParser.parse(bufferedStream, root);
+		final List<LastFmTrack> tracks = ResponseParser.parse(bufferedStream, root);
 
 		return tracks;
 	}

@@ -39,8 +39,7 @@ public class Track {
 	public void setId(final long _id) {
 		mId = _id;
 	}
-
-	// TODO use fields directly (without setters)
+	
 	public Track copy() {
 		return new Track(mId, mArtist, mTitle);
 	}

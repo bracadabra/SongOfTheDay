@@ -47,8 +47,6 @@ public class UpdateService extends IntentService {
 	private static final String TAG = UpdateService.class.getSimpleName();
 
 	private static final String EMPTY = "";
-	private static final String[] MEDIA_PROJECTION = { Media._ID, Media.ARTIST, Media.TITLE };
-
 	private static final String AUDIO_SELECTION = Media.IS_MUSIC + "!=0";
 
 	public static boolean sIsCancelled = false;
@@ -90,8 +88,8 @@ public class UpdateService extends IntentService {
 	}
 
 	private WidgetUpdateInfo fetchUpdate() throws ClientProtocolException, IOException, JSONException, VkApiException {
-		final Cursor cursor = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, MEDIA_PROJECTION, AUDIO_SELECTION,
-				null, null);
+		final Cursor cursor = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, TrackManager.MEDIA_PROJECTION,
+				AUDIO_SELECTION, null, null);
 		final TrackManager manager = new TrackManager(getApplicationContext());
 		WidgetUpdateInfo widgetInfo = null;
 		if (cursor == null) {
@@ -237,11 +235,14 @@ public class UpdateService extends IntentService {
 			final String networkPreference = preferences.getString(getString(R.string.network_type_key), wifiPreference);
 			Logger.debug(TAG, "network preference: " + networkPreference);
 			Logger.debug(TAG, "network type: " + networkInfo.getType());
+			Logger.append("network preference: " + networkPreference);
+			Logger.append("network type: " + networkInfo.getType());
 			if (!networkPreference.equals(wifiPreference) || networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
 				connectionnAvailable = true;
 			}
 		}
 		Logger.debug(TAG, "network available: " + connectionnAvailable);
+		Logger.append("network available: " + connectionnAvailable);
 
 		return connectionnAvailable;
 	}
