@@ -10,11 +10,8 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 
 import ru.vang.songoftheday.api.VkTrack;
-import android.util.Log;
 
 public class DownloadHelper {
-	private static final String FILE_TITLE = "%s - %s";
-
 	private DownloadHelper() {
 	};
 
@@ -24,9 +21,8 @@ public class DownloadHelper {
 
 		final HttpResponse response = HttpHelper.getHttpClient().execute(get);
 		if (response.getStatusLine().getStatusCode() == 200) {
-			clearCache(path);
-			final String fileName = String.format(FILE_TITLE, track.getArtist(), track.getTitle()).replace(File.separator,
-					"");
+			clearCache(path);			
+			final String fileName = getFilename(track.getArtist(), track.getTitle());
 			final File file = new File(path, fileName);
 			final FileOutputStream fos = new FileOutputStream(file);
 			final InputStream inputStream = response.getEntity().getContent();
@@ -38,8 +34,7 @@ public class DownloadHelper {
 				while ((count = inputStream.read(data)) != -1) {
 					total += count;
 					if (progressListener != null) {
-						if (progressListener.isCanceled()) {
-							Log.d("Test", "isCanceled");
+						if (progressListener.isCanceled()) {							
 							progressListener.onFinish();
 							break;
 						}
@@ -48,8 +43,7 @@ public class DownloadHelper {
 					fos.write(data, 0, count);
 				}
 				fos.flush();
-
-				Log.d("Test", "downloading finished!");
+				
 				return file.getAbsolutePath();
 			} finally {
 				fos.close();
@@ -61,6 +55,11 @@ public class DownloadHelper {
 		}
 
 		return null;
+	}
+	
+	private static String getFilename(final String artist, final String title) {
+		final String sourceString = artist + title;
+		return String.valueOf(sourceString.hashCode());
 	}
 
 	public static void clearCache(final File path) {

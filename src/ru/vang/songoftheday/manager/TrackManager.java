@@ -1,6 +1,7 @@
 package ru.vang.songoftheday.manager;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -20,11 +21,13 @@ import android.database.Cursor;
 import android.provider.MediaStore.Audio.Media;
 
 public class TrackManager {
-	private transient final Context mContext;
-
 	public static final String[] MEDIA_PROJECTION = { Media._ID, Media.ARTIST, Media.TITLE };
 	private static final int MEDIA_ARTIST_INDEX = 1;
 	private static final int MEDIA_TITLE_INDEX = 2;
+
+	private static final String EMPTY_ARTIST = null;
+
+	private transient final Context mContext;
 
 	public TrackManager(final Context context) {
 		mContext = context;
@@ -49,15 +52,17 @@ public class TrackManager {
 
 	public LastFmTrack getTopTrack() throws ClientProtocolException, IOException {
 		final List<LastFmTrack> topTracks = LastFM.getTopTracks();
-		return getNewLastFmTrack(topTracks);
+		return getNewLastFmTrack(topTracks, EMPTY_ARTIST);
 	}
 
-	private LastFmTrack getNewLastFmTrack(final List<LastFmTrack> lastFmTracks) {
+	private LastFmTrack getNewLastFmTrack(final List<LastFmTrack> lastFmTracks, final String orginalArtist) {
 		LastFmTrack track = null;
-		final SongOfTheDayDbHelper dbHelper = new SongOfTheDayDbHelper(mContext);
 		if (!lastFmTracks.isEmpty()) {
+			final SongOfTheDayDbHelper dbHelper = new SongOfTheDayDbHelper(mContext);
+			// Shuffle list cause of tracks ordered by similarity
+			Collections.shuffle(lastFmTracks, getRandom());
 			for (LastFmTrack lastFmTrack : lastFmTracks) {
-				if (!dbHelper.ifMbidExists(lastFmTrack.getMbid())) {
+				if (!(ifSameArtist(orginalArtist, lastFmTrack.getArtist()) || dbHelper.ifMbidExists(lastFmTrack.getMbid()))) {
 					track = lastFmTrack;
 					break;
 				}
@@ -66,13 +71,13 @@ public class TrackManager {
 		return track;
 	}
 
+	private boolean ifSameArtist(final String originalArtist, final String foundArtist) {
+		return originalArtist != null && originalArtist.equals(foundArtist) ? true : false;
+	}
+
 	public LastFmTrack getLastFmTrack(final String artist, final String title) throws ClientProtocolException, IOException {
 		final List<LastFmTrack> lastFmTracks = LastFM.getSimilarTracks(artist, title);
-
-		LastFmTrack foundTrack = null;
-		if (!lastFmTracks.isEmpty()) {
-			foundTrack = getNewLastFmTrack(lastFmTracks);
-		}
+		final LastFmTrack foundTrack = getNewLastFmTrack(lastFmTracks, artist);
 
 		return foundTrack;
 	}
@@ -98,7 +103,7 @@ public class TrackManager {
 		final WidgetUpdateInfo widgetInfo = new WidgetUpdateInfo();
 		VkTrack vkTrack = null;
 		final int count = cursor.getCount();
-		final Random random = new Random(System.currentTimeMillis());
+		final Random random = getRandom();
 		int index = 0;
 		do {
 			final int position = random.nextInt(count);
@@ -116,5 +121,9 @@ public class TrackManager {
 		widgetInfo.setVkTrack(vkTrack);
 
 		return widgetInfo;
+	}
+
+	private Random getRandom() {
+		return new Random(System.currentTimeMillis());
 	}
 }

@@ -169,12 +169,11 @@ public class UpdateService extends IntentService {
 
 				vkApi.addAudio(aid, oid);
 				mMainHandler.post(new ToastMessage(R.string.toast_add));
-			} catch (Exception e) {
+			} catch (final Exception e) {
+				//Catch all exceptions to inform user
 				Log.e(TAG, Log.getStackTraceString(e));
 				mMainHandler.post(new ToastMessage(R.string.toast_error));
 			}
-		} else if (ACTION_UPDATE.equals(action)) {
-			sIsCancelled = true;
 		}
 	}
 
