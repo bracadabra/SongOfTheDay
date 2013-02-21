@@ -9,4 +9,9 @@
         android:summary="@string/network_type_summary"
         android:title="@string/network_type_title" />
 
+    <ru.vang.songoftheday.preference.TimePreference
+        android:key="@string/time_key"
+        android:summary="@string/time_summary"
+        android:title="@string/time_title" />
+
 </PreferenceScreen>

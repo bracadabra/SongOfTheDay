@@ -1,5 +1,6 @@
 package ru.vang.songoftheday.database;
 
+import ru.vang.songoftheday.util.Logger;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -7,8 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class SongOfTheDayDbHelper extends SQLiteOpenHelper {
+	private static final String TAG = SongOfTheDayDbHelper.class.getSimpleName();
 	private static final int DATABASE_VERSION = 1;
-	private static final String DATABASE_NAME = "songofthedaty.db";
+	private static final String DATABASE_NAME = "songoftheday.db";
 
 	private static final String TABLE_NAME = "similarsongs";
 	private static final String COLUMN_NAME_ID = "_id";
@@ -21,12 +23,13 @@ public class SongOfTheDayDbHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(final SQLiteDatabase db) {
-		db.execSQL("CREATE TABLE " + TABLE_NAME + " (" + COLUMN_NAME_ID + " INTEGER PRIMARY KEY," + COLUMN_NAME_MBID
-				+ " TEXT NOT NULL" + ");");
+		db.execSQL("CREATE TABLE " + TABLE_NAME + " (" + COLUMN_NAME_ID
+				+ " INTEGER PRIMARY KEY," + COLUMN_NAME_MBID + " TEXT NOT NULL" + ");");
 	}
 
 	@Override
-	public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
+	public void onUpgrade(final SQLiteDatabase db, final int oldVersion,
+			final int newVersion) {
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
 		onCreate(db);
 	}
@@ -34,14 +37,16 @@ public class SongOfTheDayDbHelper extends SQLiteOpenHelper {
 	public void insertMbid(final String mbid) {
 		final SQLiteDatabase db = getWritableDatabase();
 		final ContentValues cv = new ContentValues(COLUMNS_COUNT);
+		cv.put(COLUMN_NAME_MBID, mbid);
 		db.insert(TABLE_NAME, null, cv);
 		db.close();
+		Logger.debug(TAG, "Row with mbid " + mbid + " was inserted");
 	}
 
 	public boolean ifMbidExists(final String mbid) {
 		final SQLiteDatabase db = getWritableDatabase();
-		final Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_MBID + "=?", new String[] { COLUMN_NAME_MBID }, null,
-				null, null);
+		final Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_MBID + "=?",
+				new String[] { COLUMN_NAME_MBID }, null, null, null);
 		boolean exists = false;
 		if (cursor != null) {
 			exists = cursor.getCount() > 0;

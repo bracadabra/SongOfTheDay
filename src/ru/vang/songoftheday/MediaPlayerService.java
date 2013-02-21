@@ -17,11 +17,13 @@ import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-public class MediaPlayerService extends Service implements OnPreparedListener, OnErrorListener, OnCompletionListener {
-	private static final String TAG = "Test";
+public class MediaPlayerService extends Service implements OnPreparedListener,
+		OnErrorListener, OnCompletionListener {
+	private static final String TAG = MediaPlayerService.class.getSimpleName();
 	public static final String ACTION_PLAY = "ru.vang.songoftheday.action.PLAY";
 	public static final String ACTION_STOP = "ru.vang.songoftheday.action.STOP";
 	private static final boolean START_PLAYING = true;
@@ -37,23 +39,23 @@ public class MediaPlayerService extends Service implements OnPreparedListener, O
 		Thread.currentThread().setUncaughtExceptionHandler(Logger.EXCEPTION_HANDLER);
 		mIntent = intent;
 		final String action = intent.getAction();
-		Log.d("Test", "MediaPlayerService received action: " + action);
+		Logger.debug(TAG, "MediaPlayerService has received action: " + action);
 		boolean isPlaying = STOP_PLAYING;
 		if (action.equals(ACTION_PLAY)) {
 			final Uri uri = intent.getData();
-			Log.d("Test", "uri: " + uri);
+			Logger.debug(TAG, "Data with uri " + uri + " is started to play");
 			mMediaPlayer = new MediaPlayer();
 			mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 			try {
 				mMediaPlayer.setDataSource(getApplicationContext(), uri);
 			} catch (IllegalArgumentException e) {
-				Log.e(TAG, Log.getStackTraceString(e));
+				Logger.error(TAG, Log.getStackTraceString(e));
 			} catch (SecurityException e) {
-				Log.e(TAG, Log.getStackTraceString(e));
+				Logger.error(TAG, Log.getStackTraceString(e));
 			} catch (IllegalStateException e) {
-				Log.e(TAG, Log.getStackTraceString(e));
+				Logger.error(TAG, Log.getStackTraceString(e));
 			} catch (IOException e) {
-				Log.e(TAG, Log.getStackTraceString(e));
+				Logger.error(TAG, Log.getStackTraceString(e));
 			}
 			mMediaPlayer.setOnCompletionListener(this);
 			mMediaPlayer.setOnPreparedListener(this);
@@ -68,13 +70,11 @@ public class MediaPlayerService extends Service implements OnPreparedListener, O
 		mWidget = new WidgetModel(getApplicationContext());
 		mWidget.tooglePlay(getApplicationContext(), intent, isPlaying);
 
-		// return START_NOT_STICKY because we don't need to restart service
 		return START_NOT_STICKY;
 	}
 
 	@Override
 	public IBinder onBind(final Intent intent) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -83,9 +83,9 @@ public class MediaPlayerService extends Service implements OnPreparedListener, O
 	}
 
 	public boolean onError(final MediaPlayer mp, final int what, final int extra) {
-		Logger.append("Error! what: " + what + " ; extra: " + extra);
+		Logger.error(TAG, "Error! what: " + what + " ; extra: " + extra);
 		Logger.flush();
-		// TODO Handle errors appropriately
+
 		return false;
 	}
 
@@ -97,20 +97,27 @@ public class MediaPlayerService extends Service implements OnPreparedListener, O
 
 	private void showStatus(final Intent intent) {
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		final Notification notification = new Notification(R.drawable.stat_notify_musicplayer, "Song of the day is playing",
-				System.currentTimeMillis());
-		notification.flags = notification.flags | Notification.FLAG_NO_CLEAR;
+		final NotificationCompat.Builder builder = new NotificationCompat.Builder(
+				MediaPlayerService.this)
+				.setContentTitle(getString(R.string.song_playing)).setSmallIcon(
+						R.drawable.stat_notify_musicplayer);
 
 		final Intent contentIntent = intent;
 		contentIntent.setAction(ACTION_STOP);
-		notification.contentIntent = PendingIntent.getService(getApplicationContext(), 0, contentIntent, 0);
-		notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.media_status);
+		final PendingIntent pendingStopIntent = PendingIntent.getService(
+				getApplicationContext(), 0, contentIntent, 0);
+		builder.setContentIntent(pendingStopIntent);
 
+		final RemoteViews contentView = new RemoteViews(getApplicationContext()
+				.getPackageName(), R.layout.media_status);
 		final String artist = intent.getStringExtra(WidgetModel.EXTRA_ARTIST);
+		contentView.setTextViewText(R.id.artist, artist);
 		final String title = intent.getStringExtra(WidgetModel.EXTRA_TITLE);
+		contentView.setTextViewText(R.id.title, title);
+		builder.setContent(contentView);
 
-		notification.contentView.setTextViewText(R.id.artist, artist);
-		notification.contentView.setTextViewText(R.id.title, title);
+		final Notification notification = builder.build();
+		notification.flags = notification.flags | Notification.FLAG_NO_CLEAR;
 
 		mNotificationManager.notify(NOTIFICATION_ID, notification);
 	}

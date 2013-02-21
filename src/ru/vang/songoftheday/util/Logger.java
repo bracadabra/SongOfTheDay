@@ -6,17 +6,16 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.Thread.UncaughtExceptionHandler;
 
+import ru.vang.songoftheday.SongOfTheDaySettings;
+
 import android.os.Environment;
 import android.util.Log;
 
 public class Logger {
-	private static final StringBuffer STRING_BUFFER;
-	public static final UncaughtExceptionHandler EXCEPTION_HANDLER;
-	static {
-		STRING_BUFFER = new StringBuffer();
-		EXCEPTION_HANDLER = new ExceptionHandler();
-	}
+	private static final StringBuffer STRING_BUFFER = new StringBuffer();
+	public static final UncaughtExceptionHandler EXCEPTION_HANDLER = new ExceptionHandler();
 	private static final int LOG_LEVEL = Log.VERBOSE;
+	private static final boolean WRITE_TO_FILE = true;
 
 	public static void append(final String log) {
 		STRING_BUFFER.append(log).append('\n');
@@ -24,8 +23,9 @@ public class Logger {
 
 	public static void flush() {
 		try {
-			PrintWriter printWriter = new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory() + "/"
-					+ Settings.LOG_FILE, true));
+			PrintWriter printWriter = new PrintWriter(new FileWriter(
+					Environment.getExternalStorageDirectory() + "/"
+							+ SongOfTheDaySettings.LOG_FILE, true));
 			printWriter.append(STRING_BUFFER.toString());
 			printWriter.flush();
 			printWriter.close();
@@ -37,7 +37,8 @@ public class Logger {
 	}
 
 	public static void deleteLog() {
-		final File file = new File(Environment.getExternalStorageDirectory() + "/" + Settings.LOG_FILE);
+		final File file = new File(Environment.getExternalStorageDirectory() + "/"
+				+ SongOfTheDaySettings.LOG_FILE);
 		if (file.exists()) {
 			file.delete();
 		}
@@ -48,8 +49,9 @@ public class Logger {
 		public void uncaughtException(Thread thread, Throwable ex) {
 			PrintWriter printWriter;
 			try {
-				printWriter = new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory() + "/"
-						+ Settings.LOG_FILE, true));
+				printWriter = new PrintWriter(new FileWriter(
+						Environment.getExternalStorageDirectory() + "/"
+								+ SongOfTheDaySettings.LOG_FILE, true));
 			} catch (IOException e) {
 				throw new RuntimeException("Failed to create log writer!");
 			}
@@ -84,10 +86,24 @@ public class Logger {
 	public static boolean isAssertEnabled() {
 		return LOG_LEVEL <= Log.ASSERT;
 	}
-	
+
+	public static void writeToFile(final String message) {
+		if (WRITE_TO_FILE) {
+			append(message);
+		}
+	}
+
 	public static void debug(final String tag, final String message) {
 		if (isDebugEnabled()) {
 			Log.d(tag, message);
+			writeToFile(message);
+		}
+	}
+
+	public static void error(final String tag, final String message) {
+		if (isErrorEnabled()) {
+			Log.e(tag, message);
+			writeToFile(message);
 		}
 	}
 }

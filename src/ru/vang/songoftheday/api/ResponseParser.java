@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.xml.sax.SAXException;
 
+import ru.vang.songoftheday.util.Logger;
+
 import android.sax.Element;
 import android.sax.EndElementListener;
 import android.sax.EndTextElementListener;
@@ -15,14 +17,15 @@ import android.util.Log;
 import android.util.Xml;
 
 public final class ResponseParser {
-	private static final String TAG = "Test";
+	private static final String TAG = ResponseParser.class.getSimpleName();
 
 	private ResponseParser() {
 	}
 
-	public static List<LastFmTrack> parse(final BufferedInputStream bufferedStream, final String rootElement) {
-		final List<LastFmTrack> tracks = new ArrayList<LastFmTrack>();
-		final LastFmTrack currentTrack = new LastFmTrack();
+	public static List<Track> parse(final BufferedInputStream bufferedStream,
+			final String rootElement) {
+		final List<Track> tracks = new ArrayList<Track>();
+		final Track currentTrack = new Track();
 
 		final RootElement lfm = new RootElement("lfm");
 		final Element root = lfm.getChild(rootElement);
@@ -40,11 +43,11 @@ public final class ResponseParser {
 				currentTrack.setTitle(body);
 			}
 		});
-		final Element mbid = track.getChild("mdbid");
+		final Element mbid = track.getChild("mbid");
 		mbid.setEndTextElementListener(new EndTextElementListener() {
 
 			public void end(String body) {
-				currentTrack.setMbid(body);
+				currentTrack.setId(body);
 			}
 
 		});
@@ -61,11 +64,11 @@ public final class ResponseParser {
 		try {
 			Xml.parse(bufferedStream, Xml.Encoding.UTF_8, lfm.getContentHandler());
 		} catch (IOException e) {
-			Log.e(TAG, Log.getStackTraceString(e));
+			Logger.error(TAG, Log.getStackTraceString(e));
 		} catch (SAXException e) {
-			Log.e(TAG, Log.getStackTraceString(e));
+			Logger.error(TAG, Log.getStackTraceString(e));
 		}
-		Log.d("Test", "size: " + tracks.size());
+		Logger.debug(TAG, "Parsed tracks size: " + tracks.size());
 
 		return tracks;
 	}

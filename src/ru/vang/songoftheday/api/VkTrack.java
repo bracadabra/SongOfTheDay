@@ -14,21 +14,21 @@ public class VkTrack extends Track {
 	private static final String OWNER_ID = "owner_id";
 	private static final int SEED = 31;
 	
-	private transient long mOwnerId;
+	private transient String mOwnerId;
 	private transient String mUrl;
 	private transient String mPath;	
 	
-	public VkTrack(final long aid, final long ownerId, final String artist, final String title, final String url) {
+	public VkTrack(final String aid, final String ownerId, final String artist, final String title, final String url) {
 		super(aid, artist, title);		
 		mOwnerId = ownerId;		
 		mUrl = url;
 	}
 	
-	public long getOwnerId() {
+	public String getOwnerId() {
 		return mOwnerId;
 	}
 	
-	public void setOwnerId(final long ownerId) {
+	public void setOwnerId(final String ownerId) {
 		mOwnerId = ownerId;
 	}
 	
@@ -51,8 +51,8 @@ public class VkTrack extends Track {
 	public static VkTrack valueOf(final JSONObject track) {
 		VkTrack vkTrack = null;
 		try {
-			final long aid = track.getLong(AID);
-			final long ownerId = track.getLong(OWNER_ID);
+			final String aid = track.getString(AID);
+			final String ownerId = track.getString(OWNER_ID);
 			final String artist = track.getString(ARTIST);
 			final String title = track.getString(TITLE);
 			final String url = track.getString(URL);

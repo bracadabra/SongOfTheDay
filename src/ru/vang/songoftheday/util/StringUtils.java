@@ -5,7 +5,8 @@ public final class StringUtils {
 
 	public static String extractValueFromUrl(final String url, final String name) {
 		if (url == null || name == null) {
-			throw new NullPointerException(String.format("Some arguments are null: url=%s, name=%s", url, name));
+			throw new NullPointerException(String.format(
+					"Some arguments are null: url=%s, name=%s", url, name));
 		}
 
 		final int startIndex = url.indexOf(name) + name.length() + SEPARATOR_OFFSET;

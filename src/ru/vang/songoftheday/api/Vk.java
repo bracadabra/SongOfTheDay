@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,22 +25,23 @@ import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 
+import ru.vang.songoftheday.SongOfTheDaySettings;
 import ru.vang.songoftheday.exceptions.UpdateException;
 import ru.vang.songoftheday.exceptions.VkApiException;
 import ru.vang.songoftheday.util.Logger;
-import ru.vang.songoftheday.util.Settings;
 import android.content.Context;
 import android.util.Log;
 
 public class Vk {
-	private static final String TAG = "Test";
+	private static final String TAG = Vk.class.getSimpleName();
 
 	public static final String CLIENT_ID = "2825622";
 	public static final String API_SECRET = "0hm10ji6PMjiqXLsdXU8";
 
 	private static final String CORE = "https://api.vk.com/method/";
-	private static final String SEARCH_AUDIO = CORE + "audio.search?q=%s+%s&count=" + Settings.VK_LIMIT;
-	private static final String ADD_AUDIO = CORE + "audio.add?aid=%d&oid=%d";
+	private static final String SEARCH_AUDIO = CORE + "audio.search?q=%s+%s&count="
+			+ SongOfTheDaySettings.VK_LIMIT;
+	private static final String ADD_AUDIO = CORE + "audio.add?aid=%s&oid=%s";
 
 	private transient final OAuthService mAuthSevice;
 	private transient final Token mToken;
@@ -47,19 +49,24 @@ public class Vk {
 
 	public Vk(final Context context) throws ClientProtocolException, IOException {
 		mContext = context;
-		mAuthSevice = new ServiceBuilder().provider(VkontakteApi.class).apiKey(CLIENT_ID).apiSecret(API_SECRET).build();
+		mAuthSevice = new ServiceBuilder().provider(VkontakteApi.class).apiKey(CLIENT_ID)
+				.apiSecret(API_SECRET).build();
 		mToken = getToken();
-		Logger.append(mToken.toString());
+		Logger.debug(TAG, "Token: " + mToken.toString());
 	}
 
-	public List<VkTrack> searchAudio(final String artist, final String title) throws JSONException, VkApiException {
-		final OAuthRequest request = new OAuthRequest(Verb.GET, String.format(SEARCH_AUDIO, URLEncoder.encode(artist),
-				URLEncoder.encode(title)));		
-		Log.d("Test", "audio.search: " + request.getUrl());
+	public List<VkTrack> searchAudio(final String artist, final String title)
+			throws JSONException, VkApiException, UnsupportedEncodingException {
+		final OAuthRequest request = new OAuthRequest(Verb.GET, String.format(
+				SEARCH_AUDIO,
+				URLEncoder.encode(artist, SongOfTheDaySettings.DEFAULT_CHARSET),
+				URLEncoder.encode(title, SongOfTheDaySettings.DEFAULT_CHARSET)));
+		Logger.debug(TAG, "audio.search: " + request.getUrl());
 		mAuthSevice.signRequest(mToken, request);
 		final Response response = request.send();
 		if (response.getCode() != 200) {
-			throw new UpdateException("Failed to search audio! code: " + response.getCode());
+			throw new UpdateException("Failed to search audio! code: "
+					+ response.getCode());
 		}
 
 		final List<VkTrack> tracks = new ArrayList<VkTrack>();
@@ -77,8 +84,10 @@ public class Vk {
 		return tracks;
 	}
 
-	public void addAudio(final long aid, final long oid) throws JSONException, VkApiException {
-		final OAuthRequest request = new OAuthRequest(Verb.GET, String.format(ADD_AUDIO, aid, oid));
+	public void addAudio(final String aid, final String oid) throws JSONException,
+			VkApiException {
+		final OAuthRequest request = new OAuthRequest(Verb.GET, String.format(ADD_AUDIO,
+				aid, oid));
 		mAuthSevice.signRequest(mToken, request);
 		final Response response = request.send();
 		if (response.getCode() != 200) {
@@ -88,7 +97,8 @@ public class Vk {
 		checkErrors(jObject);
 	}
 
-	private void checkErrors(final JSONObject jObject) throws JSONException, VkApiException {
+	private void checkErrors(final JSONObject jObject) throws JSONException,
+			VkApiException {
 		if (jObject.has("error")) {
 			final JSONObject error = jObject.getJSONObject("error");
 			final int code = error.getInt("error_code");
@@ -99,21 +109,21 @@ public class Vk {
 	}
 
 	public static void saveToken(final Token token, final File dir) {
-		final File file = new File(dir, Settings.TOKEN_FILENAME);
+		final File file = new File(dir, SongOfTheDaySettings.TOKEN_FILENAME);
 		ObjectOutputStream oos = null;
 		try {
 			oos = new ObjectOutputStream(new FileOutputStream(file));
 			oos.writeObject(token);
 		} catch (FileNotFoundException e) {
-			Log.e(TAG, Log.getStackTraceString(e));
+			Logger.error(TAG, Log.getStackTraceString(e));
 		} catch (IOException e) {
-			Log.e(TAG, Log.getStackTraceString(e));
+			Logger.error(TAG, Log.getStackTraceString(e));
 		} finally {
 			if (oos != null) {
 				try {
 					oos.close();
 				} catch (IOException e) {
-					Log.e(TAG, Log.getStackTraceString(e));
+					Logger.error(TAG, Log.getStackTraceString(e));
 				}
 			}
 		}
@@ -122,7 +132,8 @@ public class Vk {
 	private Token getToken() throws ClientProtocolException, IOException {
 		Token token = null;
 
-		final File file = new File(mContext.getFilesDir(), Settings.TOKEN_FILENAME);
+		final File file = new File(mContext.getFilesDir(),
+				SongOfTheDaySettings.TOKEN_FILENAME);
 		if (file.exists()) {
 			ObjectInputStream ois = null;
 			try {

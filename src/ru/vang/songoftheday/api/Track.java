@@ -1,16 +1,14 @@
 package ru.vang.songoftheday.api;
 
 public class Track {
-	protected transient long mId;
+	protected transient String mId;
 	protected transient String mTitle;
 	protected transient String mArtist;
-	private static final int SEED = 31;
-
-	public Track() {
-		// Create empty track
+	
+	public Track() {	
 	};
 
-	public Track(final long _id, final String artist, final String title) {
+	public Track(final String _id, final String artist, final String title) {
 		mId = _id;
 		mArtist = artist;
 		mTitle = title;
@@ -32,11 +30,11 @@ public class Track {
 		mArtist = artist;
 	}
 
-	public long getId() {
+	public String getId() {
 		return mId;
 	}
 
-	public void setId(final long _id) {
+	public void setId(final String _id) {
 		mId = _id;
 	}
 	
@@ -46,37 +44,26 @@ public class Track {
 
 	@Override
 	public int hashCode() {
+		final int prime = 31;
 		int result = 1;
-		result = SEED * result + ((mTitle == null) ? 0 : mTitle.hashCode());
-		result = SEED * result + ((mArtist == null) ? 0 : mArtist.hashCode());
-		result = SEED * result + String.valueOf(mId).hashCode();
-
+		result = prime * result + ((mArtist == null) ? 0 : mArtist.hashCode());
+		result = prime * result + ((mId == null) ? 0 : mId.hashCode());
+		result = prime * result + ((mTitle == null) ? 0 : mTitle.hashCode());
 		return result;
 	}
 
 	@Override
-	public boolean equals(final Object object) {
-		if (this == object) {
+	public boolean equals(Object obj) {
+		if (this == obj) {
 			return true;
 		}
-
-		if (object == null) {
+		if (obj == null) {
 			return false;
 		}
-
-		if (getClass() != object.getClass()) {
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
-
-		final Track other = (Track) object;
-		if (mTitle == null) {
-			if (other.mTitle != null) {
-				return false;
-			}
-		} else if (!mTitle.equals(other.mTitle)) {
-			return false;
-		}
-
+		Track other = (Track) obj;
 		if (mArtist == null) {
 			if (other.mArtist != null) {
 				return false;
@@ -84,11 +71,20 @@ public class Track {
 		} else if (!mArtist.equals(other.mArtist)) {
 			return false;
 		}
-
-		if (mId != other.mId) {
+		if (mId == null) {
+			if (other.mId != null) {
+				return false;
+			}
+		} else if (!mId.equals(other.mId)) {
 			return false;
 		}
-
+		if (mTitle == null) {
+			if (other.mTitle != null) {
+				return false;
+			}
+		} else if (!mTitle.equals(other.mTitle)) {
+			return false;
+		}
 		return true;
 	}
 

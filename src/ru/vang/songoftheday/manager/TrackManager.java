@@ -9,7 +9,6 @@ import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 
 import ru.vang.songoftheday.api.LastFM;
-import ru.vang.songoftheday.api.LastFmTrack;
 import ru.vang.songoftheday.api.Track;
 import ru.vang.songoftheday.api.Vk;
 import ru.vang.songoftheday.api.VkTrack;
@@ -21,7 +20,8 @@ import android.database.Cursor;
 import android.provider.MediaStore.Audio.Media;
 
 public class TrackManager {
-	public static final String[] MEDIA_PROJECTION = { Media._ID, Media.ARTIST, Media.TITLE };
+	public static final String[] MEDIA_PROJECTION = { Media._ID, Media.ARTIST,
+			Media.TITLE };
 	private static final int MEDIA_ARTIST_INDEX = 1;
 	private static final int MEDIA_TITLE_INDEX = 2;
 
@@ -33,8 +33,8 @@ public class TrackManager {
 		mContext = context;
 	}
 
-	public VkTrack getVkTrack(final String artist, final String title) throws ClientProtocolException, IOException,
-			JSONException, VkApiException {
+	public VkTrack getVkTrack(final String artist, final String title)
+			throws ClientProtocolException, IOException, JSONException, VkApiException {
 		final Vk vk = new Vk(mContext);
 		final List<VkTrack> vkTracks = vk.searchAudio(artist, title);
 
@@ -50,19 +50,21 @@ public class TrackManager {
 		return vkTrack;
 	}
 
-	public LastFmTrack getTopTrack() throws ClientProtocolException, IOException {
-		final List<LastFmTrack> topTracks = LastFM.getTopTracks();
+	public Track getTopTrack() throws ClientProtocolException, IOException {
+		final List<Track> topTracks = LastFM.getTopTracks();
 		return getNewLastFmTrack(topTracks, EMPTY_ARTIST);
 	}
 
-	private LastFmTrack getNewLastFmTrack(final List<LastFmTrack> lastFmTracks, final String orginalArtist) {
-		LastFmTrack track = null;
-		if (!lastFmTracks.isEmpty()) {
+	private Track getNewLastFmTrack(final List<Track> lastFmTracks,
+			final String orginalArtist) {
+		Track track = null;
+		if (lastFmTracks!= null && !lastFmTracks.isEmpty()) {
 			final SongOfTheDayDbHelper dbHelper = new SongOfTheDayDbHelper(mContext);
 			// Shuffle list cause of tracks ordered by similarity
 			Collections.shuffle(lastFmTracks, getRandom());
-			for (LastFmTrack lastFmTrack : lastFmTracks) {
-				if (!(ifSameArtist(orginalArtist, lastFmTrack.getArtist()) || dbHelper.ifMbidExists(lastFmTrack.getMbid()))) {
+			for (Track lastFmTrack : lastFmTracks) {
+				if (!(ifSameArtist(orginalArtist, lastFmTrack.getArtist()) || dbHelper
+						.ifMbidExists(lastFmTrack.getId()))) {
 					track = lastFmTrack;
 					break;
 				}
@@ -72,17 +74,20 @@ public class TrackManager {
 	}
 
 	private boolean ifSameArtist(final String originalArtist, final String foundArtist) {
-		return originalArtist != null && originalArtist.equals(foundArtist) ? true : false;
+		return originalArtist != null && originalArtist.equals(foundArtist) ? true
+				: false;
 	}
 
-	public LastFmTrack getLastFmTrack(final String artist, final String title) throws ClientProtocolException, IOException {
-		final List<LastFmTrack> lastFmTracks = LastFM.getSimilarTracks(artist, title);
-		final LastFmTrack foundTrack = getNewLastFmTrack(lastFmTracks, artist);
+	public Track getLastFmTrack(final String artist, final String title)
+			throws ClientProtocolException, IOException {
+		final List<Track> lastFmTracks = LastFM.getSimilarTracks(artist, title);
+		final Track foundTrack = getNewLastFmTrack(lastFmTracks, artist);
 
 		return foundTrack;
 	}
 
-	public WidgetUpdateInfo findTopTrackInfo() throws VkApiException, ClientProtocolException, IOException, JSONException {
+	public WidgetUpdateInfo findTopTrackInfo() throws VkApiException,
+			ClientProtocolException, IOException, JSONException {
 		final WidgetUpdateInfo widgetInfo = new WidgetUpdateInfo();
 		VkTrack vkTrack = null;
 		do {
@@ -98,13 +103,14 @@ public class TrackManager {
 		return widgetInfo;
 	}
 
-	public WidgetUpdateInfo findSimilarTrackInfo(final Cursor cursor) throws VkApiException, ClientProtocolException,
-			IOException, JSONException {
+	public WidgetUpdateInfo findSimilarTrackInfo(final Cursor cursor)
+			throws VkApiException, ClientProtocolException, IOException, JSONException {
 		final WidgetUpdateInfo widgetInfo = new WidgetUpdateInfo();
-		VkTrack vkTrack = null;
 		final int count = cursor.getCount();
 		final Random random = getRandom();
 		int index = 0;
+		VkTrack vkTrack = null;
+		Track track = null;
 		do {
 			final int position = random.nextInt(count);
 			cursor.moveToPosition(position);
@@ -112,12 +118,16 @@ public class TrackManager {
 			final String originalArtist = cursor.getString(MEDIA_ARTIST_INDEX);
 			widgetInfo.setOriginalArtist(originalArtist);
 			widgetInfo.setOriginalTitle(originalTitle);
-			final LastFmTrack track = getLastFmTrack(originalArtist, originalTitle);
+			track = getLastFmTrack(originalArtist, originalTitle);
 			if (track != null) {
 				vkTrack = getVkTrack(track.getArtist(), track.getTitle());
 			}
 			index++;
 		} while (vkTrack == null && index < count);
+		if (track != null && vkTrack != null) {
+			final SongOfTheDayDbHelper dbHelper = new SongOfTheDayDbHelper(mContext);
+			dbHelper.insertMbid(track.getId());
+		}
 		widgetInfo.setVkTrack(vkTrack);
 
 		return widgetInfo;

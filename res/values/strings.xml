@@ -18,6 +18,7 @@
     <string name="sdcard_missing_title_nosdcard">No USB storage</string>
     <string name="toast_add">Song has been added!</string>
     <string name="toast_error">Some error occurs!</string>
+    <string name="song_playing">Song of the day is playing</string>
 
     <!-- Content description -->
     <string name="desc_preference">Settings</string>
@@ -35,8 +36,14 @@
     <string name="network_any">Any</string>
     <string name="wifi_value">0</string>
     <string name="any_value">1</string>
+    <string name="time_key">time_key</string>
+    <string name="time_title">Update time</string>
+    <string name="time_summary">Choose update time</string>
     
-    <!-- Widget update info activity -->
+    <!-- WidgetUpdateInfoActivity -->
     <string name="original_title">Original title:</string>
     <string name="original_artist">Original artist:</string>
+    
+    <!-- VkAuthActivity -->
+    <string name="skip">Skip</string>
 </resources>
