@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import android.util.Log;
 
 public class VkTrack extends Track {
-	private static final String TAG = "Test";
+	private static final String TAG = VkTrack.class.getSimpleName();
 	private static final String ARTIST = "artist";
 	private static final String TITLE = "title";
 	private static final String URL = "url";

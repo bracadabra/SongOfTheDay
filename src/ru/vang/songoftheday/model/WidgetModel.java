@@ -36,7 +36,7 @@ public class WidgetModel {
 
 	public WidgetModel(final Context context) {
 		mContext = context;
-		mManager = AppWidgetManager.getInstance(context);
+		mManager = AppWidgetManager.getInstance(context);		
 		mComponentName = new ComponentName(context, SongOfTheDayWidget.class);
 		mRemoteViews = new RemoteViews(context.getPackageName(), R.layout.widget);
 	}
@@ -106,6 +106,15 @@ public class WidgetModel {
 		final PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0,
 				intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		mRemoteViews.setOnClickPendingIntent(R.id.widget_info, pendingIntent);
+		showInfo();
+	}
+
+	public void hideInfo() {
+		mRemoteViews.setViewVisibility(R.id.widget_info, View.GONE);
+	}
+
+	public void showInfo() {
+		mRemoteViews.setViewVisibility(R.id.widget_info, View.VISIBLE);
 	}
 
 	private void bindButtons(final String artist, final String title, final Uri path,

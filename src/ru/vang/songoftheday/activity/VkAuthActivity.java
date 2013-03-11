@@ -27,6 +27,9 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+//TODO handle orientation changes
+//TODO check network
+//TODO handle errors
 public class VkAuthActivity extends Activity {
 	private static final String CALLBACK_LINK = "http://api.vk.com/blank.html";
 	private static final String PERMISSIONS = "audio,offline";
@@ -52,8 +55,8 @@ public class VkAuthActivity extends Activity {
 		setupWebView(webView);
 
 		mAuthSevice = new ServiceBuilder().provider(VkontakteApi.class)
-				.apiKey(Vk.CLIENT_ID).apiSecret(Vk.API_SECRET)
-				.scope(PERMISSIONS).callback(CALLBACK_LINK).build();
+				.apiKey(Vk.CLIENT_ID).apiSecret(Vk.API_SECRET).scope(PERMISSIONS)
+				.callback(CALLBACK_LINK).build();
 		final String url = mAuthSevice.getAuthorizationUrl(null);
 		webView.loadUrl(url);
 
@@ -96,23 +99,21 @@ public class VkAuthActivity extends Activity {
 		}
 	}
 
-	private void finishActivity(final String preferenceKey,
-			final boolean preferenceValue) {
+	private void finishActivity(final String preferenceKey, final boolean preferenceValue) {
 		final SharedPreferences preferences = getSharedPreferences(
 				SongOfTheDaySettings.SHARED_PREF_NAME, Context.MODE_PRIVATE);
 		final Editor editor = preferences.edit();
 		editor.putBoolean(preferenceKey, preferenceValue);
 		editor.commit();
 
-		final Intent serviceIntent = new Intent(VkAuthActivity.this,
-				UpdateService.class);
+		// TODO remove if this cause widget updates twice
+		final Intent serviceIntent = new Intent(VkAuthActivity.this, UpdateService.class);
 		serviceIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
 		startService(serviceIntent);
 
 		if (mAppWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
 			final Intent resultValue = new Intent();
-			resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
-					mAppWidgetId);
+			resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
 			setResult(RESULT_OK, resultValue);
 		}
 
@@ -123,11 +124,9 @@ public class VkAuthActivity extends Activity {
 
 		@Override
 		protected Token doInBackground(final String... urls) {
-			final String code = StringUtils.extractValueFromUrl(urls[0],
-					CODE_NAME);
+			final String code = StringUtils.extractValueFromUrl(urls[0], CODE_NAME);
 			final Verifier verifier = new Verifier(code);
-			final Token accessToken = mAuthSevice
-					.getAccessToken(null, verifier);
+			final Token accessToken = mAuthSevice.getAccessToken(null, verifier);
 
 			return accessToken;
 		}

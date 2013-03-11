@@ -8,6 +8,7 @@ import java.util.Random;
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 
+import ru.vang.songoftheday.SongOfTheDaySettings;
 import ru.vang.songoftheday.api.LastFM;
 import ru.vang.songoftheday.api.Track;
 import ru.vang.songoftheday.api.Vk;
@@ -16,6 +17,7 @@ import ru.vang.songoftheday.database.SongOfTheDayDbHelper;
 import ru.vang.songoftheday.exceptions.VkApiException;
 import ru.vang.songoftheday.model.WidgetUpdateInfo;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.provider.MediaStore.Audio.Media;
 
@@ -58,7 +60,7 @@ public class TrackManager {
 	private Track getNewLastFmTrack(final List<Track> lastFmTracks,
 			final String orginalArtist) {
 		Track track = null;
-		if (lastFmTracks!= null && !lastFmTracks.isEmpty()) {
+		if (lastFmTracks != null && !lastFmTracks.isEmpty()) {
 			final SongOfTheDayDbHelper dbHelper = new SongOfTheDayDbHelper(mContext);
 			// Shuffle list cause of tracks ordered by similarity
 			Collections.shuffle(lastFmTracks, getRandom());
@@ -89,16 +91,22 @@ public class TrackManager {
 	public WidgetUpdateInfo findTopTrackInfo() throws VkApiException,
 			ClientProtocolException, IOException, JSONException {
 		final WidgetUpdateInfo widgetInfo = new WidgetUpdateInfo();
+		final boolean hasVkAccount = hasVkAccount();
+		widgetInfo.setHasVkAccount(hasVkAccount);
 		VkTrack vkTrack = null;
+		Track track = null;
 		do {
-			final Track track = getTopTrack();
+			track = getTopTrack();
 			if (track != null) {
-				widgetInfo.setOriginalArtist(track.getArtist());
-				widgetInfo.setOriginalTitle(track.getTitle());
-				vkTrack = getVkTrack(track.getArtist(), track.getTitle());
+				widgetInfo.setTrack(track);
+				if (hasVkAccount) {
+					vkTrack = getVkTrack(track.getArtist(), track.getTitle());
+				}
 			}
-		} while (vkTrack == null);
-		widgetInfo.setVkTrack(vkTrack);
+		} while ((vkTrack == null && hasVkAccount) || (track == null && !hasVkAccount));
+		if (hasVkAccount) {
+			widgetInfo.setVkTrack(vkTrack);
+		}
 
 		return widgetInfo;
 	}
@@ -106,34 +114,63 @@ public class TrackManager {
 	public WidgetUpdateInfo findSimilarTrackInfo(final Cursor cursor)
 			throws VkApiException, ClientProtocolException, IOException, JSONException {
 		final WidgetUpdateInfo widgetInfo = new WidgetUpdateInfo();
-		final int count = cursor.getCount();
-		final Random random = getRandom();
-		int index = 0;
+		final boolean hasVkAccount = hasVkAccount();
+		widgetInfo.setHasVkAccount(hasVkAccount);
 		VkTrack vkTrack = null;
 		Track track = null;
-		do {
-			final int position = random.nextInt(count);
-			cursor.moveToPosition(position);
+		final int count = cursor.getCount();
+		final int[] indexes = shuffleIndexes(count);
+		for (int i = 0; i < count; i++) {
+			cursor.moveToPosition(indexes[i]);
 			final String originalTitle = cursor.getString(MEDIA_TITLE_INDEX);
 			final String originalArtist = cursor.getString(MEDIA_ARTIST_INDEX);
 			widgetInfo.setOriginalArtist(originalArtist);
 			widgetInfo.setOriginalTitle(originalTitle);
 			track = getLastFmTrack(originalArtist, originalTitle);
-			if (track != null) {
+			if (track != null && hasVkAccount) {
+				widgetInfo.setTrack(track);
 				vkTrack = getVkTrack(track.getArtist(), track.getTitle());
 			}
-			index++;
-		} while (vkTrack == null && index < count);
-		if (track != null && vkTrack != null) {
+			if (vkTrack != null || (track != null && !hasVkAccount)) {
+				break;
+			}
+		}
+		if (track != null) {
 			final SongOfTheDayDbHelper dbHelper = new SongOfTheDayDbHelper(mContext);
 			dbHelper.insertMbid(track.getId());
 		}
-		widgetInfo.setVkTrack(vkTrack);
+		if (hasVkAccount) {
+			widgetInfo.setVkTrack(vkTrack);
+		}
 
 		return widgetInfo;
 	}
 
 	private Random getRandom() {
 		return new Random(System.currentTimeMillis());
+	}
+
+	private boolean hasVkAccount() {
+		final SharedPreferences preferences = mContext.getSharedPreferences(
+				SongOfTheDaySettings.SHARED_PREF_NAME, Context.MODE_PRIVATE);
+		final boolean hasVkAccount = !preferences.getBoolean(
+				SongOfTheDaySettings.PREF_KEY_SKIPPED, false);
+		return hasVkAccount;
+	}
+
+	private int[] shuffleIndexes(final int length) {
+		final int[] indexes = new int[length];
+		for (int i = 0; i < length; i++) {
+			indexes[i] = i;
+		}
+		final Random random = getRandom();
+		for (int i = 0; i < length; i++) {
+			final int position = i + random.nextInt(length - i);
+			final int buffer = indexes[i];
+			indexes[i] = indexes[position];
+			indexes[position] = buffer;
+		}
+
+		return indexes;
 	}
 }

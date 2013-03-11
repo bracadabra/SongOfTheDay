@@ -33,10 +33,17 @@ public class MediaPlayerService extends Service implements OnPreparedListener,
 	private transient NotificationManager mNotificationManager;
 	private transient Intent mIntent;
 	private transient WidgetModel mWidget;
+	
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		Thread.currentThread().setUncaughtExceptionHandler(Logger.EXCEPTION_HANDLER);
+		mWidget = new WidgetModel(getApplicationContext());
+		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+	}
 
 	@Override
-	public int onStartCommand(final Intent intent, final int flags, final int startId) {
-		Thread.currentThread().setUncaughtExceptionHandler(Logger.EXCEPTION_HANDLER);
+	public int onStartCommand(final Intent intent, final int flags, final int startId) {		
 		mIntent = intent;
 		final String action = intent.getAction();
 		Logger.debug(TAG, "MediaPlayerService has received action: " + action);
@@ -65,9 +72,7 @@ public class MediaPlayerService extends Service implements OnPreparedListener,
 		} else if (action.equals(ACTION_STOP)) {
 			stopPlayer();
 			stopSelf();
-		}
-
-		mWidget = new WidgetModel(getApplicationContext());
+		}		
 		mWidget.tooglePlay(getApplicationContext(), intent, isPlaying);
 
 		return START_NOT_STICKY;
@@ -91,12 +96,12 @@ public class MediaPlayerService extends Service implements OnPreparedListener,
 
 	@Override
 	public void onDestroy() {
-		stopPlayer();
 		super.onDestroy();
+		stopPlayer();
+		Logger.flush();
 	}
 
-	private void showStatus(final Intent intent) {
-		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+	private void showStatus(final Intent intent) {		
 		final NotificationCompat.Builder builder = new NotificationCompat.Builder(
 				MediaPlayerService.this)
 				.setContentTitle(getString(R.string.song_playing)).setSmallIcon(
@@ -127,10 +132,10 @@ public class MediaPlayerService extends Service implements OnPreparedListener,
 	}
 
 	public void stopPlayer() {
-		if (mMediaPlayer != null) {
-			mNotificationManager.cancel(NOTIFICATION_ID);
+		if (mMediaPlayer != null) {			
 			mMediaPlayer.release();
 		}
+		mNotificationManager.cancel(NOTIFICATION_ID);
 		mWidget.tooglePlay(getApplicationContext(), mIntent, STOP_PLAYING);
 	}
 }

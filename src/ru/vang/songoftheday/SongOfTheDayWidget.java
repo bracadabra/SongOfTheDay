@@ -1,6 +1,7 @@
 package ru.vang.songoftheday;
 
 import ru.vang.songoftheday.model.WidgetModel;
+import ru.vang.songoftheday.util.AlarmHelper;
 import ru.vang.songoftheday.util.Logger;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -9,14 +10,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.os.Bundle;
 
 public class SongOfTheDayWidget extends AppWidgetProvider {
 	private static final String TAG = SongOfTheDayWidget.class.getSimpleName();
 
 	@Override
-	public void onUpdate(final Context context,
-			final AppWidgetManager appWidgetManager, final int[] appWidgetIds) {
+	public void onUpdate(final Context context, final AppWidgetManager appWidgetManager,
+			final int[] appWidgetIds) {
 		Logger.debug(TAG, "onUpdate is called");
 		final Intent serviceIntent = new Intent(context, UpdateService.class);
 		serviceIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
@@ -29,18 +29,11 @@ public class SongOfTheDayWidget extends AppWidgetProvider {
 
 		final String action = intent.getAction();
 		Logger.debug(TAG, "Action " + action + " is recieved");
-		if (AppWidgetManager.ACTION_APPWIDGET_UPDATE.equals(action)) {
-			final Bundle extras = intent.getExtras();
-			if (extras == null
-					|| !extras.containsKey(AppWidgetManager.EXTRA_APPWIDGET_ID)) {
-				onUpdate(context, null, null);
-			}
-		} else if (WidgetModel.ACTION_ADD.equals(action)) {
+		if (WidgetModel.ACTION_ADD.equals(action)) {
 			intent.setComponent(new ComponentName(context, UpdateService.class));
 			context.startService(intent);
 		} else if (WidgetModel.ACTION_CANCEL.equals(action)) {
-			final Intent stopServiceIntent = new Intent(context,
-					UpdateService.class);
+			final Intent stopServiceIntent = new Intent(context, UpdateService.class);
 			context.stopService(stopServiceIntent);
 		}
 	}
@@ -50,6 +43,7 @@ public class SongOfTheDayWidget extends AppWidgetProvider {
 		Logger.debug(TAG, "onDisabled is called");
 		super.onDisabled(context);
 		context.stopService(new Intent(context, UpdateService.class));
+		AlarmHelper.cancelAlaram(context);
 
 		// Currently multiple instances isn't supported, thats why set completed
 		// flag here

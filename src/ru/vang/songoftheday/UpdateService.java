@@ -143,13 +143,14 @@ public class UpdateService extends IntentService {
 				TrackManager.MEDIA_PROJECTION, AUDIO_SELECTION, null, null);
 		final TrackManager manager = new TrackManager(getApplicationContext());
 		WidgetUpdateInfo widgetInfo = null;
-		if (cursor == null) {
+		if (cursor == null || cursor.getCount() == 0) {
 			widgetInfo = manager.findTopTrackInfo();
 		} else {
 			widgetInfo = manager.findSimilarTrackInfo(cursor);
+		}
+		if (cursor != null) {
 			cursor.close();
 		}
-
 		if (widgetInfo.getVkTrack() != null) {
 			downloadTrack(widgetInfo);
 		}
@@ -170,16 +171,22 @@ public class UpdateService extends IntentService {
 		final Context context = getApplicationContext();
 		try {
 			final WidgetUpdateInfo widgetInfo = fetchUpdate();
-			if (widgetInfo.isCancelled() || widgetInfo.getVkTrack() == null) {
+			if (widgetInfo.isCancelled() || widgetInfo.getTrack() == null) {
 				widget.setWidgetText(R.string.not_found);
 			} else {
+				widget.setWidgetText(widgetInfo.getTitle(), widgetInfo.getArtist());
 				final VkTrack vkTrack = widgetInfo.getVkTrack();
-				widget.setWidgetText(vkTrack.getTitle(), vkTrack.getArtist());
-				widget.bindPlay(vkTrack);
-				widget.bindAdd(vkTrack.getId(), vkTrack.getOwnerId());
-				widget.bindInfo(widgetInfo.getOriginalArtist(),
-						widgetInfo.getOriginalTitle(), vkTrack.getArtist(),
-						vkTrack.getTitle());
+				if (vkTrack != null) {
+					widget.bindPlay(vkTrack);
+					widget.bindAdd(vkTrack.getId(), vkTrack.getOwnerId());
+					if (widgetInfo.isOriginalEmpty()) {
+						widget.hideInfo();
+					} else {
+						widget.bindInfo(widgetInfo.getOriginalArtist(),
+								widgetInfo.getOriginalTitle(), vkTrack.getArtist(),
+								vkTrack.getTitle());
+					}
+				}
 			}
 		} catch (ClientProtocolException e) {
 			Logger.error(TAG, Log.getStackTraceString(e));

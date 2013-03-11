@@ -85,6 +85,8 @@ public final class AlarmHelper {
 	private static PendingIntent createAlarmIntent(final Context context) {
 		final Intent intent = new Intent(context, SongOfTheDayWidget.class);
 		intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+		intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,
+				new int[] { AppWidgetManager.INVALID_APPWIDGET_ID });
 		return PendingIntent.getBroadcast(context, 0, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 	}
