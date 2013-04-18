@@ -6,14 +6,16 @@ import static ru.vang.songoftheday.model.WidgetModel.EXTRA_OID;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.concurrent.Semaphore;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 
-import ru.vang.songoftheday.activity.VkAuthActivity;
+import ru.vang.songoftheday.api.LastFmErrors;
 import ru.vang.songoftheday.api.Vk;
+import ru.vang.songoftheday.api.VkErrors;
 import ru.vang.songoftheday.api.VkTrack;
-import ru.vang.songoftheday.exceptions.UpdateException;
+import ru.vang.songoftheday.exceptions.LastFmException;
 import ru.vang.songoftheday.exceptions.VkApiException;
 import ru.vang.songoftheday.manager.TrackManager;
 import ru.vang.songoftheday.model.WidgetModel;
@@ -23,8 +25,7 @@ import ru.vang.songoftheday.network.DownloadProgressListener;
 import ru.vang.songoftheday.util.AlarmHelper;
 import ru.vang.songoftheday.util.AvailabilityUtils;
 import ru.vang.songoftheday.util.Logger;
-import android.app.IntentService;
-import android.app.PendingIntent;
+import android.app.Service;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
@@ -37,26 +38,43 @@ import android.text.format.DateFormat;
 import android.util.Log;
 import android.widget.Toast;
 
-public class UpdateService extends IntentService {
-	private static final String TAG = UpdateService.class.getSimpleName();
+public class ThrottleUpdateService extends Service {
+	private static final String TAG = ThrottleUpdateService.class.getSimpleName();
 
 	private static final String EMPTY = "";
 	private static final String AUDIO_SELECTION = Media.IS_MUSIC + "!=0";
 
+	private static final Semaphore mSemaphore = new Semaphore(1, true);
 	private transient final Handler mMainHandler = new Handler();
 	private transient DownloadProgressListener mDownloadProgressListener = null;
 
-	public UpdateService() {
-		super(UpdateService.class.getName());
+	private boolean mRedelivery;
+
+	@Override
+	public void onStart(final Intent intent, final int startId) {
+		if (mSemaphore.availablePermits() > 0) {
+			final Thread thread = getWorkingThread(intent, startId);
+			thread.start();
+		}
 	}
 
 	@Override
-	public IBinder onBind(final Intent intent) {
+	public int onStartCommand(final Intent intent, final int flags, final int startId) {
+		onStart(intent, startId);
+		return mRedelivery ? START_REDELIVER_INTENT : START_NOT_STICKY;
+	}
+
+	public void setRedelivery(final boolean redelivery) {
+		mRedelivery = redelivery;
+	}
+
+	@Override
+	public IBinder onBind(Intent intent) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
-	protected void onHandleIntent(final Intent intent) {
+	public void onHandleIntent(final Intent intent) {
 		Thread.currentThread().setUncaughtExceptionHandler(Logger.EXCEPTION_HANDLER);
 		final SharedPreferences sharedPreferences = getSharedPreferences(
 				SongOfTheDaySettings.SHARED_PREF_NAME, Context.MODE_PRIVATE);
@@ -71,12 +89,30 @@ public class UpdateService extends IntentService {
 
 		final String action = intent.getAction();
 		if (AppWidgetManager.ACTION_APPWIDGET_UPDATE.equals(action)) {
-			updateWidget();
+			final boolean isAlarmUpdate = intent.getBooleanExtra(
+					AlarmHelper.EXTRA_ALARM_UPDATE, false);
+			updateWidget(isAlarmUpdate);
 		} else if (ACTION_ADD.equals(action)) {
 			addTrack(intent);
 		}
 		Logger.flush();
 	}
+
+	private Thread getWorkingThread(final Intent intent, final int startId) {
+		return new Thread(new Runnable() {
+
+			public void run() {
+				try {
+					if (mSemaphore.tryAcquire()) {
+						onHandleIntent(intent);
+						stopSelf(startId);
+					}
+				} finally {
+					mSemaphore.release();
+				}
+			}
+		});
+	};
 
 	@Override
 	public void onDestroy() {
@@ -86,15 +122,15 @@ public class UpdateService extends IntentService {
 		}
 	}
 
-	private void updateWidget() {
+	private void updateWidget(final boolean isAlarmUpdate) {
 		Logger.debug(
 				TAG,
 				"Update is started at "
 						+ DateFormat.format(AlarmHelper.DATE_PATTERN, new Date()));
 
 		final WidgetModel widget = new WidgetModel(getApplicationContext());
-		final CharSequence errorState = AvailabilityUtils
-				.checkErrorState(UpdateService.this);
+		final CharSequence errorState = AvailabilityUtils.checkErrorState(
+				ThrottleUpdateService.this, isAlarmUpdate);
 		Logger.debug(TAG, "errorState: " + errorState);
 		try {
 			widget.startUpdate();
@@ -109,7 +145,7 @@ public class UpdateService extends IntentService {
 			widget.bindUpdate();
 
 			widget.finishUpdate();
-			AlarmHelper.setAlarm(UpdateService.this);
+			AlarmHelper.setAlarm(ThrottleUpdateService.this);
 		}
 
 		Logger.debug(
@@ -168,7 +204,6 @@ public class UpdateService extends IntentService {
 
 	// TODO display correct error messages
 	private void buildUpdate(final WidgetModel widget) {
-		final Context context = getApplicationContext();
 		try {
 			final WidgetUpdateInfo widgetInfo = fetchUpdate();
 			if (widgetInfo.isCancelled() || widgetInfo.getTrack() == null) {
@@ -197,16 +232,14 @@ public class UpdateService extends IntentService {
 		} catch (JSONException e) {
 			Logger.error(TAG, Log.getStackTraceString(e));
 			widget.setWidgetText(R.string.exception);
-		} catch (VkApiException e) {
-			Logger.error(TAG, Log.getStackTraceString(e));
-			widget.setWidgetText(e.getUserMessage());
-			final Intent intent = new Intent(context, VkAuthActivity.class);
-			final PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
-					intent, PendingIntent.FLAG_UPDATE_CURRENT);
-			widget.setOnClickEvent(R.id.details_container, pendingIntent);
-		} catch (UpdateException e) {
-			Logger.error(TAG, Log.getStackTraceString(e));
-			widget.setWidgetText(e.getMessage());
+		} catch (VkApiException vkEx) {
+			Logger.error(TAG, Log.getStackTraceString(vkEx));
+			final VkErrors error = vkEx.getVkError();
+			widget.setWidgetText(R.string.vk_tag, error.getMessageId());
+		} catch (final LastFmException lastFmEx) {
+			Logger.error(TAG, Log.getStackTraceString(lastFmEx));
+			final LastFmErrors error = lastFmEx.getLastFmError();
+			widget.setWidgetText(R.string.last_fm_tag, error.getMessageId());
 		}
 	}
 
@@ -222,4 +255,5 @@ public class UpdateService extends IntentService {
 		}
 
 	}
+
 }

@@ -16,8 +16,9 @@ import android.content.SharedPreferences;
 import android.text.format.DateFormat;
 
 public final class AlarmHelper {
-	private static final String TAG = AlarmHelper.class.getSimpleName();
 	public static final String DATE_PATTERN = "dd-MM-yyyy hh:mm:ss a";
+	public static final String EXTRA_ALARM_UPDATE = "ru.vang.songoftheday.EXTRA_ALARM_UPDATE";
+	private static final String TAG = AlarmHelper.class.getSimpleName();	
 
 	private AlarmHelper() {
 	}
@@ -85,6 +86,9 @@ public final class AlarmHelper {
 	private static PendingIntent createAlarmIntent(final Context context) {
 		final Intent intent = new Intent(context, SongOfTheDayWidget.class);
 		intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+		intent.putExtra(EXTRA_ALARM_UPDATE, true);
+		// Add fake id to launch update. onUpdate won't called w/o widget id in
+		// extra
 		intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,
 				new int[] { AppWidgetManager.INVALID_APPWIDGET_ID });
 		return PendingIntent.getBroadcast(context, 0, intent,

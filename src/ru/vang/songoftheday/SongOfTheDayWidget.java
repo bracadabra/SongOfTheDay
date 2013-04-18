@@ -18,7 +18,7 @@ public class SongOfTheDayWidget extends AppWidgetProvider {
 	public void onUpdate(final Context context, final AppWidgetManager appWidgetManager,
 			final int[] appWidgetIds) {
 		Logger.debug(TAG, "onUpdate is called");
-		final Intent serviceIntent = new Intent(context, UpdateService.class);
+		final Intent serviceIntent = new Intent(context, ThrottleUpdateService.class);
 		serviceIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
 		context.startService(serviceIntent);
 	}
@@ -30,10 +30,10 @@ public class SongOfTheDayWidget extends AppWidgetProvider {
 		final String action = intent.getAction();
 		Logger.debug(TAG, "Action " + action + " is recieved");
 		if (WidgetModel.ACTION_ADD.equals(action)) {
-			intent.setComponent(new ComponentName(context, UpdateService.class));
+			intent.setComponent(new ComponentName(context, ThrottleUpdateService.class));
 			context.startService(intent);
 		} else if (WidgetModel.ACTION_CANCEL.equals(action)) {
-			final Intent stopServiceIntent = new Intent(context, UpdateService.class);
+			final Intent stopServiceIntent = new Intent(context, ThrottleUpdateService.class);
 			context.stopService(stopServiceIntent);
 		}
 	}
@@ -42,7 +42,7 @@ public class SongOfTheDayWidget extends AppWidgetProvider {
 	public void onDisabled(final Context context) {
 		Logger.debug(TAG, "onDisabled is called");
 		super.onDisabled(context);
-		context.stopService(new Intent(context, UpdateService.class));
+		context.stopService(new Intent(context, ThrottleUpdateService.class));
 		AlarmHelper.cancelAlaram(context);
 
 		// Currently multiple instances isn't supported, thats why set completed

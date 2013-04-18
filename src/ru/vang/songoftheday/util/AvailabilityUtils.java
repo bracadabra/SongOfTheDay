@@ -10,12 +10,13 @@ import android.net.NetworkInfo;
 import android.os.Environment;
 
 public final class AvailabilityUtils {
+	private static final int DEFAULT_WAITING_TIME = 5000;
 
 	private AvailabilityUtils() {
 
 	}
 
-	public static boolean isConnectionAvailable(final Context context) {
+	public static boolean isConnectionForUpdateAvailable(final Context context) {
 		boolean connectionnAvailable = false;
 		final ConnectivityManager connectivityManager = (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -35,7 +36,16 @@ public final class AvailabilityUtils {
 		return connectionnAvailable;
 	}
 
-	public static CharSequence checkErrorState(final Context context) {
+	public static boolean isConnectionAvailable(final Context context) {
+		final ConnectivityManager connectivityManager = (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		final NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+		return networkInfo != null && networkInfo.isConnected();
+	}
+
+	public static CharSequence checkErrorState(final Context context,
+			final boolean isAlarmUpdate) {
 		final String status = Environment.getExternalStorageState();
 		CharSequence errorState = null;
 		final Resources resources = context.getResources();
@@ -46,8 +56,22 @@ public final class AvailabilityUtils {
 			errorState = resources.getText(R.string.sdcard_missing_title_nosdcard);
 		}
 
-		if (errorState == null && !AvailabilityUtils.isConnectionAvailable(context)) {
-			errorState = resources.getString(R.string.network_unavailable);
+		if (errorState == null
+				&& !AvailabilityUtils.isConnectionForUpdateAvailable(context)) {
+			if (isAlarmUpdate) {
+				// Wait for 5 seconds while wi fi connecting
+				try {
+					Thread.sleep(DEFAULT_WAITING_TIME);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if (!AvailabilityUtils.isConnectionForUpdateAvailable(context)) {
+					errorState = resources.getString(R.string.network_unavailable);
+				}
+			} else {
+				errorState = resources.getString(R.string.network_unavailable);
+			}
 		}
 
 		return errorState;

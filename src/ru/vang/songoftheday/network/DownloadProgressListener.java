@@ -60,7 +60,7 @@ public class DownloadProgressListener implements ProgressListener {
 		mNotification.contentView.setTextViewText(R.id.percentage, progress + "%");
 		mNotification.contentView.setProgressBar(R.id.status_progress, 100, progress,
 				false);
-		mNotificationManager.notify(NOTIFICATION_ID, mNotification);
+		mNotificationManager.notify(NOTIFICATION_ID, mNotification);		
 		mPrevProgress = progress;
 	}
 

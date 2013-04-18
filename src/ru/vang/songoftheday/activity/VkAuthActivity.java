@@ -8,17 +8,22 @@ import org.scribe.oauth.OAuthService;
 
 import ru.vang.songoftheday.R;
 import ru.vang.songoftheday.SongOfTheDaySettings;
-import ru.vang.songoftheday.UpdateService;
+import ru.vang.songoftheday.ThrottleUpdateService;
 import ru.vang.songoftheday.api.Vk;
+import ru.vang.songoftheday.util.AvailabilityUtils;
 import ru.vang.songoftheday.util.StringUtils;
-import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -28,9 +33,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 //TODO handle orientation changes
-//TODO check network
 //TODO handle errors
-public class VkAuthActivity extends Activity {
+public class VkAuthActivity extends FragmentActivity {
 	private static final String CALLBACK_LINK = "http://api.vk.com/blank.html";
 	private static final String PERMISSIONS = "audio,offline";
 	private static final String CODE_NAME = "code";
@@ -46,8 +50,14 @@ public class VkAuthActivity extends Activity {
 	};
 
 	public void onCreate(final Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 		getWindow().requestFeature(Window.FEATURE_PROGRESS);
+		super.onCreate(savedInstanceState);
+		if (!AvailabilityUtils.isConnectionAvailable(getApplicationContext())) {
+			final DialogFragment errorDialog = NetworkUnavailableDialog.newInstance();
+			errorDialog.show(getSupportFragmentManager(), NetworkUnavailableDialog.TAG);
+			return;
+		}
+
 		setResult(RESULT_CANCELED);
 		setContentView(R.layout.vk_auth);
 
@@ -74,16 +84,14 @@ public class VkAuthActivity extends Activity {
 	private void setupWebView(final WebView webView) {
 		webView.setWebChromeClient(new WebChromeClient() {
 			public void onProgressChanged(WebView view, int progress) {
-				VkAuthActivity.this.setProgress(progress * 1000);
+				VkAuthActivity.this.setProgress(progress * 100);
 			}
 		});
 		webView.setWebViewClient(new WebViewClient() {
 			@Override
 			public boolean shouldOverrideUrlLoading(final WebView webView,
 					final String url) {
-				processUrl(webView, url);
-
-				return false;
+				return processUrl(webView, url);
 			}
 		});
 
@@ -91,11 +99,13 @@ public class VkAuthActivity extends Activity {
 		webSettings.setSavePassword(false);
 	}
 
-	private void processUrl(final WebView webView, final String url) {
+	private boolean processUrl(final WebView webView, final String url) {
 		if (url.contains(CALLBACK_LINK)) {
 			new AuthTask().execute(url);
+			return true;
 		} else {
 			webView.loadUrl(url);
+			return false;
 		}
 	}
 
@@ -106,8 +116,7 @@ public class VkAuthActivity extends Activity {
 		editor.putBoolean(preferenceKey, preferenceValue);
 		editor.commit();
 
-		// TODO remove if this cause widget updates twice
-		final Intent serviceIntent = new Intent(VkAuthActivity.this, UpdateService.class);
+		final Intent serviceIntent = new Intent(VkAuthActivity.this, ThrottleUpdateService.class);
 		serviceIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
 		startService(serviceIntent);
 
@@ -136,5 +145,30 @@ public class VkAuthActivity extends Activity {
 			Vk.saveToken(result, getFilesDir());
 			finishActivity(SongOfTheDaySettings.PREF_KEY_COMPLETED, true);
 		}
+	}
+
+	public static class NetworkUnavailableDialog extends DialogFragment {
+		public static final String TAG = NetworkUnavailableDialog.class.getSimpleName();
+
+		public static NetworkUnavailableDialog newInstance() {
+			return new NetworkUnavailableDialog();
+		}
+
+		@Override
+		public Dialog onCreateDialog(final Bundle savedInstanceState) {
+			final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+			builder.setTitle(R.string.error_dialog_title);
+			builder.setMessage(R.string.network_unavailable_dialog_message);
+			builder.setPositiveButton(android.R.string.ok,
+					new DialogInterface.OnClickListener() {
+
+						public void onClick(final DialogInterface dialog, final int which) {
+							getActivity().finish();
+						}
+					});
+
+			return builder.create();
+		}
+
 	}
 }

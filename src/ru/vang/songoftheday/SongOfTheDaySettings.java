@@ -15,7 +15,7 @@ public final class SongOfTheDaySettings {
 	public static final String PREF_KEY_SKIPPED = "skipped";
 
 	public static final int LAST_FM_LIMIT = 25;
-	public static final int VK_LIMIT = 25;
+	public static final int VK_LIMIT = 1;
 	public static final String DEFAULT_CHARSET = Charset.defaultCharset().displayName();
 	
 	public static final String DEFAULT_UPDATE_TIME = "7:00";

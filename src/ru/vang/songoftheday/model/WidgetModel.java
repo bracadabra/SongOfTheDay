@@ -27,7 +27,6 @@ public class WidgetModel {
 	public static final String EXTRA_TITLE = "ru.vang.songoftheday.title";
 	public static final String EXTRA_AID = "ru.vang.songoftheday.aid";
 	public static final String EXTRA_OID = "ru.vang.songoftheday.oid";
-	private static final String EMPTY_STRING = "";
 
 	private final Context mContext;
 	private final AppWidgetManager mManager;
@@ -36,7 +35,7 @@ public class WidgetModel {
 
 	public WidgetModel(final Context context) {
 		mContext = context;
-		mManager = AppWidgetManager.getInstance(context);		
+		mManager = AppWidgetManager.getInstance(context);
 		mComponentName = new ComponentName(context, SongOfTheDayWidget.class);
 		mRemoteViews = new RemoteViews(context.getPackageName(), R.layout.widget);
 	}
@@ -54,6 +53,10 @@ public class WidgetModel {
 	public void bindUpdate() {
 		final Intent intent = new Intent(mContext, SongOfTheDayWidget.class);
 		intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+		// Add fake id to launch update. onUpdate won't called w/o widget id in
+		// extra
+		intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,
+				new int[] { AppWidgetManager.INVALID_APPWIDGET_ID });
 		final PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0,
 				intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		mRemoteViews.setOnClickPendingIntent(R.id.update, pendingIntent);
@@ -164,21 +167,35 @@ public class WidgetModel {
 		mRemoteViews.setViewVisibility(R.id.details_container, View.VISIBLE);
 	}
 
+	public void setWidgetText(final int primaryTextResId, final int secondaryTextResId) {
+		final String primaryText = mContext.getString(primaryTextResId);
+		final String secondaryText = mContext.getString(secondaryTextResId);
+		setWidgetText(primaryText, secondaryText);
+	}
+
 	public void setWidgetText(final CharSequence primaryText,
 			final CharSequence secondaryText) {
 		mRemoteViews.setTextViewText(R.id.title, primaryText);
+		mRemoteViews.setViewVisibility(R.id.title, View.VISIBLE);
 		mRemoteViews.setTextViewText(R.id.artist, secondaryText);
+		mRemoteViews.setViewVisibility(R.id.artist, View.VISIBLE);
 	}
 
 	public void setWidgetText(final CharSequence primaryText) {
 		mRemoteViews.setTextViewText(R.id.title, primaryText);
-		mRemoteViews.setTextViewText(R.id.artist, EMPTY_STRING);
+		mRemoteViews.setViewVisibility(R.id.artist, View.GONE);
 	}
 
 	public void setWidgetText(final int primaryTextId) {
 		final String primaryText = mContext.getResources().getString(primaryTextId);
 		mRemoteViews.setTextViewText(R.id.title, primaryText);
-		mRemoteViews.setTextViewText(R.id.artist, EMPTY_STRING);
+		mRemoteViews.setViewVisibility(R.id.artist, View.GONE);
+	}
+
+	public void setWidgetSecondaryText(final int secondaryTextId) {
+		final String secondaryText = mContext.getResources().getString(secondaryTextId);
+		mRemoteViews.setViewVisibility(R.id.title, View.GONE);
+		mRemoteViews.setTextViewText(R.id.artist, secondaryText);
 	}
 
 	public void updateWidgetState() {

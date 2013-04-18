@@ -5,10 +5,8 @@ import java.io.IOException;
 import ru.vang.songoftheday.model.WidgetModel;
 import ru.vang.songoftheday.util.Logger;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -21,6 +19,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+//TODO set foreground
 public class MediaPlayerService extends Service implements OnPreparedListener,
 		OnErrorListener, OnCompletionListener {
 	private static final String TAG = MediaPlayerService.class.getSimpleName();
@@ -29,8 +28,9 @@ public class MediaPlayerService extends Service implements OnPreparedListener,
 	private static final boolean START_PLAYING = true;
 	private static final boolean STOP_PLAYING = false;
 	private static final int NOTIFICATION_ID = 1;
+	
 	private transient MediaPlayer mMediaPlayer = null;
-	private transient NotificationManager mNotificationManager;
+	
 	private transient Intent mIntent;
 	private transient WidgetModel mWidget;
 	
@@ -38,8 +38,7 @@ public class MediaPlayerService extends Service implements OnPreparedListener,
 	public void onCreate() {
 		super.onCreate();
 		Thread.currentThread().setUncaughtExceptionHandler(Logger.EXCEPTION_HANDLER);
-		mWidget = new WidgetModel(getApplicationContext());
-		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		mWidget = new WidgetModel(getApplicationContext());	
 	}
 
 	@Override
@@ -66,8 +65,7 @@ public class MediaPlayerService extends Service implements OnPreparedListener,
 			}
 			mMediaPlayer.setOnCompletionListener(this);
 			mMediaPlayer.setOnPreparedListener(this);
-			mMediaPlayer.prepareAsync();
-			showStatus(intent);
+			mMediaPlayer.prepareAsync();		
 			isPlaying = START_PLAYING;
 		} else if (action.equals(ACTION_STOP)) {
 			stopPlayer();
@@ -84,6 +82,8 @@ public class MediaPlayerService extends Service implements OnPreparedListener,
 	}
 
 	public void onPrepared(final MediaPlayer mp) {
+		final Notification notification = createNotification(mIntent);
+		startForeground(NOTIFICATION_ID, notification);
 		mp.start();
 	}
 
@@ -97,11 +97,11 @@ public class MediaPlayerService extends Service implements OnPreparedListener,
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		stopPlayer();
+		stopPlayer();		
 		Logger.flush();
 	}
-
-	private void showStatus(final Intent intent) {		
+	
+	private Notification createNotification(final Intent intent) {
 		final NotificationCompat.Builder builder = new NotificationCompat.Builder(
 				MediaPlayerService.this)
 				.setContentTitle(getString(R.string.song_playing)).setSmallIcon(
@@ -123,19 +123,19 @@ public class MediaPlayerService extends Service implements OnPreparedListener,
 
 		final Notification notification = builder.build();
 		notification.flags = notification.flags | Notification.FLAG_NO_CLEAR;
-
-		mNotificationManager.notify(NOTIFICATION_ID, notification);
+		
+		return notification;	
 	}
 
 	public void onCompletion(final MediaPlayer mp) {
 		stopPlayer();
+		stopForeground(true);
 	}
 
 	public void stopPlayer() {
 		if (mMediaPlayer != null) {			
 			mMediaPlayer.release();
-		}
-		mNotificationManager.cancel(NOTIFICATION_ID);
+		}	
 		mWidget.tooglePlay(getApplicationContext(), mIntent, STOP_PLAYING);
 	}
 }

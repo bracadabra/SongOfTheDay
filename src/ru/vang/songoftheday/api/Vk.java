@@ -26,7 +26,6 @@ import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 
 import ru.vang.songoftheday.SongOfTheDaySettings;
-import ru.vang.songoftheday.exceptions.UpdateException;
 import ru.vang.songoftheday.exceptions.VkApiException;
 import ru.vang.songoftheday.util.Logger;
 import android.content.Context;
@@ -65,7 +64,7 @@ public class Vk {
 		mAuthSevice.signRequest(mToken, request);
 		final Response response = request.send();
 		if (response.getCode() != 200) {
-			throw new UpdateException("Failed to search audio! code: "
+			throw new VkApiException("Failed to search audio! code: "
 					+ response.getCode());
 		}
 
@@ -91,7 +90,7 @@ public class Vk {
 		mAuthSevice.signRequest(mToken, request);
 		final Response response = request.send();
 		if (response.getCode() != 200) {
-			throw new UpdateException("Failed to add audio");
+			throw new VkApiException("Failed to add audio");
 		}
 		final JSONObject jObject = new JSONObject(response.getBody());
 		checkErrors(jObject);
@@ -100,11 +99,11 @@ public class Vk {
 	private void checkErrors(final JSONObject jObject) throws JSONException,
 			VkApiException {
 		if (jObject.has("error")) {
-			final JSONObject error = jObject.getJSONObject("error");
-			final int code = error.getInt("error_code");
-			final String message = error.getString("error_msg");
+			final JSONObject json = jObject.getJSONObject("error");
+			final int code = json.getInt("error_code");
+			final VkErrors error = VkErrors.getValueByCode(code);
 
-			throw new VkApiException(code, message);
+			throw new VkApiException(error);
 		}
 	}
 
