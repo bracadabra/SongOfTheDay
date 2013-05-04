@@ -1,13 +1,6 @@
 package ru.vang.songoftheday.api;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OptionalDataException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -29,7 +22,7 @@ import ru.vang.songoftheday.SongOfTheDaySettings;
 import ru.vang.songoftheday.exceptions.VkApiException;
 import ru.vang.songoftheday.util.Logger;
 import android.content.Context;
-import android.util.Log;
+import android.content.SharedPreferences;
 
 public class Vk {
 	private static final String TAG = Vk.class.getSimpleName();
@@ -44,13 +37,11 @@ public class Vk {
 
 	private transient final OAuthService mAuthSevice;
 	private transient final Token mToken;
-	private transient final Context mContext;
 
 	public Vk(final Context context) throws ClientProtocolException, IOException {
-		mContext = context;
 		mAuthSevice = new ServiceBuilder().provider(VkontakteApi.class).apiKey(CLIENT_ID)
 				.apiSecret(API_SECRET).build();
-		mToken = getToken();
+		mToken = getToken(context);
 		Logger.debug(TAG, "Token: " + mToken.toString());
 	}
 
@@ -107,49 +98,21 @@ public class Vk {
 		}
 	}
 
-	public static void saveToken(final Token token, final File dir) {
-		final File file = new File(dir, SongOfTheDaySettings.TOKEN_FILENAME);
-		ObjectOutputStream oos = null;
-		try {
-			oos = new ObjectOutputStream(new FileOutputStream(file));
-			oos.writeObject(token);
-		} catch (FileNotFoundException e) {
-			Logger.error(TAG, Log.getStackTraceString(e));
-		} catch (IOException e) {
-			Logger.error(TAG, Log.getStackTraceString(e));
-		} finally {
-			if (oos != null) {
-				try {
-					oos.close();
-				} catch (IOException e) {
-					Logger.error(TAG, Log.getStackTraceString(e));
-				}
-			}
-		}
+	public static boolean saveToken(final Context context, final Token token) {
+		final SharedPreferences preferences = context.getSharedPreferences(
+				SongOfTheDaySettings.SHARED_PREF_NAME, Context.MODE_PRIVATE);
+		return preferences.edit()
+				.putString(SongOfTheDaySettings.PREF_KEY_TOKEN, token.getToken())
+				.commit();
 	}
 
-	private Token getToken() throws ClientProtocolException, IOException {
-		Token token = null;
-
-		final File file = new File(mContext.getFilesDir(),
-				SongOfTheDaySettings.TOKEN_FILENAME);
-		if (file.exists()) {
-			ObjectInputStream ois = null;
-			try {
-				ois = new ObjectInputStream(new FileInputStream(file));
-				token = (Token) ois.readObject();
-			} catch (OptionalDataException e) {
-				Log.e(TAG, Log.getStackTraceString(e));
-			} catch (ClassNotFoundException e) {
-				Log.e(TAG, Log.getStackTraceString(e));
-			} catch (IOException e) {
-				Log.e(TAG, Log.getStackTraceString(e));
-			} finally {
-				if (ois != null) {
-					ois.close();
-				}
-			}
-		}
+	private static Token getToken(final Context context) throws ClientProtocolException,
+			IOException {
+		final SharedPreferences preferences = context.getSharedPreferences(
+				SongOfTheDaySettings.SHARED_PREF_NAME, Context.MODE_PRIVATE);
+		final String tokenStr = preferences.getString(
+				SongOfTheDaySettings.PREF_KEY_TOKEN, null);
+		final Token token = new Token(tokenStr, API_SECRET);
 
 		return token;
 	}

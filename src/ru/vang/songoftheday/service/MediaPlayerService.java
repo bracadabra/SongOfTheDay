@@ -1,7 +1,8 @@
-package ru.vang.songoftheday;
+package ru.vang.songoftheday.service;
 
 import java.io.IOException;
 
+import ru.vang.songoftheday.R;
 import ru.vang.songoftheday.model.WidgetModel;
 import ru.vang.songoftheday.util.Logger;
 import android.app.Notification;
@@ -19,7 +20,6 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-//TODO set foreground
 public class MediaPlayerService extends Service implements OnPreparedListener,
 		OnErrorListener, OnCompletionListener {
 	private static final String TAG = MediaPlayerService.class.getSimpleName();

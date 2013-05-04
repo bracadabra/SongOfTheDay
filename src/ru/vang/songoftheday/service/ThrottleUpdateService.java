@@ -1,4 +1,4 @@
-package ru.vang.songoftheday;
+package ru.vang.songoftheday.service;
 
 import static ru.vang.songoftheday.model.WidgetModel.ACTION_ADD;
 import static ru.vang.songoftheday.model.WidgetModel.EXTRA_AID;
@@ -11,12 +11,15 @@ import java.util.concurrent.Semaphore;
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 
+import ru.vang.songoftheday.R;
+import ru.vang.songoftheday.SongOfTheDaySettings;
 import ru.vang.songoftheday.api.LastFmErrors;
 import ru.vang.songoftheday.api.Vk;
 import ru.vang.songoftheday.api.VkErrors;
 import ru.vang.songoftheday.api.VkTrack;
 import ru.vang.songoftheday.exceptions.LastFmException;
 import ru.vang.songoftheday.exceptions.VkApiException;
+import ru.vang.songoftheday.fragment.AuthFragment;
 import ru.vang.songoftheday.manager.TrackManager;
 import ru.vang.songoftheday.model.WidgetModel;
 import ru.vang.songoftheday.model.WidgetUpdateInfo;
@@ -69,8 +72,7 @@ public class ThrottleUpdateService extends Service {
 	}
 
 	@Override
-	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
+	public IBinder onBind(Intent intent) {		
 		return null;
 	}
 
@@ -78,11 +80,10 @@ public class ThrottleUpdateService extends Service {
 		Thread.currentThread().setUncaughtExceptionHandler(Logger.EXCEPTION_HANDLER);
 		final SharedPreferences sharedPreferences = getSharedPreferences(
 				SongOfTheDaySettings.SHARED_PREF_NAME, Context.MODE_PRIVATE);
-		final boolean isCompleted = sharedPreferences.getBoolean(
-				SongOfTheDaySettings.PREF_KEY_COMPLETED, false);
-		final boolean isAuthSkipped = sharedPreferences.getBoolean(
-				SongOfTheDaySettings.PREF_KEY_SKIPPED, false);
-		if (!isCompleted && !isAuthSkipped) {
+		final int status = sharedPreferences.getInt(
+				SongOfTheDaySettings.PREF_KEY_AUTH_STATUS,
+				AuthFragment.STATUS_INCOMPLETED);
+		if (status == AuthFragment.STATUS_INCOMPLETED) {
 			Logger.debug(TAG, "Update was skipped.");
 			return;
 		}

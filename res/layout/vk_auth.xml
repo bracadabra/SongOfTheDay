@@ -5,11 +5,10 @@
     android:orientation="vertical" >
 
     <WebView
-        android:id="@+id/webView"
+        android:id="@+id/web_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
-    <!-- Use Holo style -->
 
     <Button
         android:id="@+id/skip"

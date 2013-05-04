@@ -1,6 +1,8 @@
 package ru.vang.songoftheday;
 
+import ru.vang.songoftheday.fragment.AuthFragment;
 import ru.vang.songoftheday.model.WidgetModel;
+import ru.vang.songoftheday.service.ThrottleUpdateService;
 import ru.vang.songoftheday.util.AlarmHelper;
 import ru.vang.songoftheday.util.Logger;
 import android.appwidget.AppWidgetManager;
@@ -33,7 +35,8 @@ public class SongOfTheDayWidget extends AppWidgetProvider {
 			intent.setComponent(new ComponentName(context, ThrottleUpdateService.class));
 			context.startService(intent);
 		} else if (WidgetModel.ACTION_CANCEL.equals(action)) {
-			final Intent stopServiceIntent = new Intent(context, ThrottleUpdateService.class);
+			final Intent stopServiceIntent = new Intent(context,
+					ThrottleUpdateService.class);
 			context.stopService(stopServiceIntent);
 		}
 	}
@@ -50,8 +53,9 @@ public class SongOfTheDayWidget extends AppWidgetProvider {
 		final SharedPreferences preferences = context.getSharedPreferences(
 				SongOfTheDaySettings.SHARED_PREF_NAME, Context.MODE_PRIVATE);
 		final Editor editor = preferences.edit();
-		editor.putBoolean(SongOfTheDaySettings.PREF_KEY_COMPLETED, false);
-		editor.commit();
+		editor.putInt(SongOfTheDaySettings.PREF_KEY_AUTH_STATUS,
+				AuthFragment.STATUS_INCOMPLETED);
+		editor.apply();
 		// Logger.deleteLog();
 	}
 }

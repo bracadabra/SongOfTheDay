@@ -1,11 +1,11 @@
 package ru.vang.songoftheday.model;
 
-import ru.vang.songoftheday.MediaPlayerService;
 import ru.vang.songoftheday.R;
 import ru.vang.songoftheday.SongOfTheDayWidget;
 import ru.vang.songoftheday.activity.WidgetPreferenceActivity;
 import ru.vang.songoftheday.activity.WidgetUpdateInfoActivity;
 import ru.vang.songoftheday.api.VkTrack;
+import ru.vang.songoftheday.service.MediaPlayerService;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;

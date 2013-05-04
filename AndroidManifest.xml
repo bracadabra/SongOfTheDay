@@ -19,8 +19,7 @@
         android:label="@string/app_name" >
         <activity
             android:name=".activity.VkAuthActivity"
-            android:excludeFromRecents="true"
-            android:screenOrientation="portrait" >
+            android:excludeFromRecents="true" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
@@ -46,8 +45,8 @@
         </receiver>
 
         <service android:name=".UpdateService" />
-        <service android:name=".ThrottleUpdateService" />
-        <service android:name=".MediaPlayerService" />
+        <service android:name="ru.vang.songoftheday.service.ThrottleUpdateService" />
+        <service android:name="ru.vang.songoftheday.service.MediaPlayerService" />
     </application>
 
 </manifest>
