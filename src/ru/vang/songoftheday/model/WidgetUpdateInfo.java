@@ -11,6 +11,7 @@ public class WidgetUpdateInfo {
 	private Track mLastFmTrack;
 	private Status mStatus = Status.SUCCESS;
 	private boolean mHasVkAccount;
+	private boolean mAuthorizationFailed;
 
 	public String getOriginalTitle() {
 		return mOriginalTitle;
@@ -78,6 +79,14 @@ public class WidgetUpdateInfo {
 
 	public boolean isOriginalEmpty() {
 		return mOriginalTitle == null || mOriginalArtist == null;
+	}
+
+	public void setAuthorizationFailed(final boolean status) {
+		mAuthorizationFailed = status;
+	}
+
+	public boolean isAuthorizationFailed() {
+		return mAuthorizationFailed;
 	}
 
 	public static enum Status {

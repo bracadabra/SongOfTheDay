@@ -22,16 +22,18 @@
     <string name="desc_info">Widget Info</string>
 
     <!-- Preferences -->
-    <string name="network_type_key">network_key</string>
-    <string name="network_type_title">Network Type</string>
-    <string name="network_type_summary">Required network connectivity required to download the song</string>
+    <string name="key_network_type">network_key</string>
+    <string name="title_network_type">Network Type</string>
+    <string name="summary_network_type">Required network connectivity required to download the song</string>
     <string name="network_wifi">Wi-Fi</string>
     <string name="network_any">Any</string>
     <string name="wifi_value">0</string>
     <string name="any_value">1</string>
-    <string name="time_key">time_key</string>
-    <string name="time_title">Update time</string>
-    <string name="time_summary">Choose update time</string>
+    <string name="key_time">time_key</string>
+    <string name="title_time">Update time</string>
+    <string name="summary_time">Choose update time</string>
+    <string name="key_update_token">update_token_key</string>
+    <string name="title_update_token">Update token</string>
 
     <!-- WidgetUpdateInfoActivity -->
     <string name="original_title">Original title:</string>
@@ -60,12 +62,12 @@
     <!-- VK errors -->
     <string name="vk_tag">VK</string>
     <string name="unknown_error">Unknown error occurred</string>
-    <string name="application_disabled">Application is disabled. Enable your application or use test mode.</string>
-    <string name="incorrect_signature">Incorrect signature.</string>
-    <string name="authorization_failed">User authorization failed.</string>
-    <string name="too_many_requests">Too many requests per second.</string>
-    <string name="parameter_missing">One of the parameters specified was missing or invalid.</string>
-    <string name="access_denied">Access denied.</string>
+    <string name="application_disabled">Application is disabled. Enable your application or use test mode</string>
+    <string name="incorrect_signature">Incorrect signature</string>
+    <string name="authorization_failed">User authorization failed</string>
+    <string name="too_many_requests">Too many requests per second</string>
+    <string name="parameter_missing">One of the parameters specified was missing or invalid</string>
+    <string name="access_denied">Access denied</string>
 
     <!-- Other errors -->
     <string name="exception">Terrible thing happened</string>
@@ -76,5 +78,7 @@
     <string name="sdcard_missing_title">No SD card</string>
     <string name="sdcard_missing_title_nosdcard">No USB storage</string>
     <string name="toast_error">Some error occurs!</string>
+    <string name="authorization_failed_title">VK authorization failed</string>
+    <string name="update_token">Update token in settings</string>
 
 </resources>

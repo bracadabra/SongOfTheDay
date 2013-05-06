@@ -8,8 +8,10 @@ import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
+import android.util.Log;
 
 public final class AvailabilityUtils {
+	private static final String TAG = AvailabilityUtils.class.getName();
 	private static final int DEFAULT_WAITING_TIME = 5000;
 
 	private AvailabilityUtils() {
@@ -26,7 +28,7 @@ public final class AvailabilityUtils {
 					SongOfTheDaySettings.SHARED_PREF_NAME, Context.MODE_PRIVATE);
 			final String wifiPreference = context.getString(R.string.wifi_value);
 			final String networkPreference = preferences.getString(
-					context.getString(R.string.network_type_key), wifiPreference);
+					context.getString(R.string.key_network_type), wifiPreference);
 			if (!networkPreference.equals(wifiPreference)
 					|| networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
 				connectionnAvailable = true;
@@ -62,9 +64,8 @@ public final class AvailabilityUtils {
 				// Wait for 5 seconds while wi fi connecting
 				try {
 					Thread.sleep(DEFAULT_WAITING_TIME);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				} catch (final InterruptedException e) {
+					Logger.error(TAG, Log.getStackTraceString(e));
 				}
 				if (!AvailabilityUtils.isConnectionForUpdateAvailable(context)) {
 					errorState = resources.getString(R.string.network_unavailable);

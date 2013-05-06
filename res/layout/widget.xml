@@ -116,13 +116,14 @@
         android:background="@color/divider"
         android:contentDescription="@string/desc_divider" />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/widget_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:src="@drawable/ic_details"
-        android:contentDescription="@string/desc_info" />
+        android:background="@drawable/image_button_states"
+        android:contentDescription="@string/desc_info"
+        android:src="@drawable/ic_details" />
 
 </RelativeLayout>

@@ -69,7 +69,7 @@ public final class AlarmHelper {
 			final Calendar calendar) {
 		final SharedPreferences preferences = context.getSharedPreferences(
 				SongOfTheDaySettings.SHARED_PREF_NAME, Context.MODE_PRIVATE);
-		final String key = context.getString(R.string.time_key);
+		final String key = context.getString(R.string.key_time);
 		final String time = preferences.getString(key,
 				SongOfTheDaySettings.DEFAULT_UPDATE_TIME);
 		final int[] timeParts = TimePreference.parseTime(time);

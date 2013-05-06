@@ -5,13 +5,22 @@
         android:defaultValue="@string/wifi_value"
         android:entries="@array/connectivity_entries"
         android:entryValues="@array/connectivity_values"
-        android:key="@string/network_type_key"
-        android:summary="@string/network_type_summary"
-        android:title="@string/network_type_title" />
+        android:key="@string/key_network_type"
+        android:summary="@string/summary_network_type"
+        android:title="@string/title_network_type" />
 
     <ru.vang.songoftheday.preference.TimePreference
-        android:key="@string/time_key"
-        android:summary="@string/time_summary"
-        android:title="@string/time_title" />
+        android:key="@string/key_time"
+        android:summary="@string/summary_time"
+        android:title="@string/title_time" />
+
+    <PreferenceScreen
+        android:enabled="false"
+        android:title="@string/title_update_token"
+        android:key="@string/key_update_token" >
+        <intent
+            android:targetClass="ru.vang.songoftheday.activity.VkAuthActivity"
+            android:targetPackage="ru.vang.songoftheday" />
+    </PreferenceScreen>
 
 </PreferenceScreen>

@@ -89,9 +89,8 @@ public class TrackManager {
 		return foundTrack;
 	}
 
-	public WidgetUpdateInfo findTopTrackInfo() throws VkApiException,
-			ClientProtocolException, IOException, JSONException {
-		final WidgetUpdateInfo widgetInfo = new WidgetUpdateInfo();
+	public void findTopTrackInfo(final WidgetUpdateInfo widgetInfo) throws VkApiException,
+			ClientProtocolException, IOException, JSONException {		
 		final boolean hasVkAccount = hasVkAccount();
 		widgetInfo.setHasVkAccount(hasVkAccount);
 		VkTrack vkTrack = null;
@@ -108,13 +107,10 @@ public class TrackManager {
 		if (hasVkAccount) {
 			widgetInfo.setVkTrack(vkTrack);
 		}
-
-		return widgetInfo;
 	}
 
-	public WidgetUpdateInfo findSimilarTrackInfo(final Cursor cursor)
-			throws VkApiException, ClientProtocolException, IOException, JSONException {
-		final WidgetUpdateInfo widgetInfo = new WidgetUpdateInfo();
+	public void findSimilarTrackInfo(final Cursor cursor, final WidgetUpdateInfo widgetInfo)
+			throws VkApiException, ClientProtocolException, IOException, JSONException {		
 		final boolean hasVkAccount = hasVkAccount();
 		widgetInfo.setHasVkAccount(hasVkAccount);
 		VkTrack vkTrack = null;
@@ -143,8 +139,6 @@ public class TrackManager {
 		if (hasVkAccount) {
 			widgetInfo.setVkTrack(vkTrack);
 		}
-
-		return widgetInfo;
 	}
 
 	private Random getRandom() {

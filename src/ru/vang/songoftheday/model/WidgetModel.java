@@ -67,8 +67,12 @@ public class WidgetModel {
 				track.getId(), track.getOwnerId(), false);
 	}
 
-	public void bindPreference() {
+	public void bindPreference(final boolean enableUpdateToken) {
 		final Intent intent = new Intent(mContext, WidgetPreferenceActivity.class);
+		if (enableUpdateToken) {
+			intent.putExtra(WidgetPreferenceActivity.EXTRA_ENABLE_UPDATE_TOKEN,
+					enableUpdateToken);
+		}
 		final PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0,
 				intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		mRemoteViews.setOnClickPendingIntent(R.id.preference, pendingIntent);
@@ -122,7 +126,7 @@ public class WidgetModel {
 
 	private void bindButtons(final String artist, final String title, final Uri path,
 			final String aid, final String oid, final boolean isPlaing) {
-		bindPreference();
+		bindPreference(false);
 		bindPlay(artist, title, path, aid, oid, isPlaing);
 		bindAdd(aid, oid);
 		bindUpdate();
@@ -149,12 +153,13 @@ public class WidgetModel {
 
 	public void startUpdate() {
 		showProgressBar();
+		hideInfo();
 		mManager.updateAppWidget(mComponentName, mRemoteViews);
 	}
 
 	public void showProgressBar() {
 		mRemoteViews.setViewVisibility(R.id.progressbar_container, View.VISIBLE);
-		mRemoteViews.setViewVisibility(R.id.details_container, View.GONE);
+		mRemoteViews.setViewVisibility(R.id.details_container, View.GONE);		
 	}
 
 	public void finishUpdate() {
@@ -164,7 +169,7 @@ public class WidgetModel {
 
 	public void hideProgressBar() {
 		mRemoteViews.setViewVisibility(R.id.progressbar_container, View.GONE);
-		mRemoteViews.setViewVisibility(R.id.details_container, View.VISIBLE);
+		mRemoteViews.setViewVisibility(R.id.details_container, View.VISIBLE);		
 	}
 
 	public void setWidgetText(final int primaryTextResId, final int secondaryTextResId) {

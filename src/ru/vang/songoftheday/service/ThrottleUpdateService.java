@@ -72,7 +72,7 @@ public class ThrottleUpdateService extends Service {
 	}
 
 	@Override
-	public IBinder onBind(Intent intent) {		
+	public IBinder onBind(Intent intent) {
 		return null;
 	}
 
@@ -133,17 +133,18 @@ public class ThrottleUpdateService extends Service {
 		final CharSequence errorState = AvailabilityUtils.checkErrorState(
 				ThrottleUpdateService.this, isAlarmUpdate);
 		Logger.debug(TAG, "errorState: " + errorState);
+		final WidgetUpdateInfo widgetUpdateInfo = new WidgetUpdateInfo();
 		try {
 			widget.startUpdate();
 			if (errorState == null) {
 				stopService(new Intent(getApplicationContext(), MediaPlayerService.class));
-				buildUpdate(widget);
+				buildUpdate(widget, widgetUpdateInfo);
 			} else {
 				widget.setWidgetText(errorState, EMPTY);
 			}
 		} finally {
-			widget.bindPreference();
 			widget.bindUpdate();
+			widget.bindPreference(widgetUpdateInfo.isAuthorizationFailed());
 
 			widget.finishUpdate();
 			AlarmHelper.setAlarm(ThrottleUpdateService.this);
@@ -174,16 +175,15 @@ public class ThrottleUpdateService extends Service {
 		}
 	}
 
-	private WidgetUpdateInfo fetchUpdate() throws ClientProtocolException, IOException,
-			JSONException, VkApiException {
+	private void fetchUpdate(final WidgetUpdateInfo widgetInfo)
+			throws ClientProtocolException, IOException, JSONException, VkApiException {
 		final Cursor cursor = getContentResolver().query(Media.EXTERNAL_CONTENT_URI,
 				TrackManager.MEDIA_PROJECTION, AUDIO_SELECTION, null, null);
 		final TrackManager manager = new TrackManager(getApplicationContext());
-		WidgetUpdateInfo widgetInfo = null;
 		if (cursor == null || cursor.getCount() == 0) {
-			widgetInfo = manager.findTopTrackInfo();
+			manager.findTopTrackInfo(widgetInfo);
 		} else {
-			widgetInfo = manager.findSimilarTrackInfo(cursor);
+			manager.findSimilarTrackInfo(cursor, widgetInfo);
 		}
 		if (cursor != null) {
 			cursor.close();
@@ -191,8 +191,6 @@ public class ThrottleUpdateService extends Service {
 		if (widgetInfo.getVkTrack() != null) {
 			downloadTrack(widgetInfo);
 		}
-
-		return widgetInfo;
 	}
 
 	private void downloadTrack(final WidgetUpdateInfo widgetInfo)
@@ -203,10 +201,9 @@ public class ThrottleUpdateService extends Service {
 				mDownloadProgressListener);
 	}
 
-	// TODO display correct error messages
-	private void buildUpdate(final WidgetModel widget) {
+	private void buildUpdate(final WidgetModel widget, final WidgetUpdateInfo widgetInfo) {
 		try {
-			final WidgetUpdateInfo widgetInfo = fetchUpdate();
+			fetchUpdate(widgetInfo);
 			if (widgetInfo.isCancelled() || widgetInfo.getTrack() == null) {
 				widget.setWidgetText(R.string.not_found);
 			} else {
@@ -221,6 +218,7 @@ public class ThrottleUpdateService extends Service {
 						widget.bindInfo(widgetInfo.getOriginalArtist(),
 								widgetInfo.getOriginalTitle(), vkTrack.getArtist(),
 								vkTrack.getTitle());
+						widget.showInfo();
 					}
 				}
 			}
@@ -236,7 +234,13 @@ public class ThrottleUpdateService extends Service {
 		} catch (VkApiException vkEx) {
 			Logger.error(TAG, Log.getStackTraceString(vkEx));
 			final VkErrors error = vkEx.getVkError();
-			widget.setWidgetText(R.string.vk_tag, error.getMessageId());
+			if (error == VkErrors.AUTHORIZATION_FAILED) {
+				widget.setWidgetText(R.string.authorization_failed_title,
+						R.string.update_token);
+				widgetInfo.setAuthorizationFailed(true);
+			} else {
+				widget.setWidgetText(R.string.vk_tag, error.getMessageId());
+			}
 		} catch (final LastFmException lastFmEx) {
 			Logger.error(TAG, Log.getStackTraceString(lastFmEx));
 			final LastFmErrors error = lastFmEx.getLastFmError();
@@ -254,7 +258,5 @@ public class ThrottleUpdateService extends Service {
 		public void run() {
 			Toast.makeText(getApplicationContext(), mStringId, Toast.LENGTH_SHORT).show();
 		}
-
 	}
-
 }

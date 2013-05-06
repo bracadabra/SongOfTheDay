@@ -28,7 +28,8 @@
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
         android:textAppearance="@android:style/TextAppearance.Small"
-        android:textColor="?android:textColorPrimary" />
+        android:textColor="?android:textColorPrimary"
+        android:textIsSelectable="false" />
 
     <TextView
         android:id="@+id/songTitle"
@@ -43,7 +44,8 @@
         android:paddingRight="15dp"
         android:paddingTop="3dp"
         android:singleLine="true"
-        android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent.Title" />
+        android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent.Title"
+        android:textIsSelectable="false" />
 
     <ProgressBar
         android:id="@+id/status_progress"
@@ -68,6 +70,6 @@
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
         android:paddingTop="3dp"
-        android:src="@drawable/ic_clear_normal" />
+        android:src="@drawable/ic_clear" />
 
 </RelativeLayout>
