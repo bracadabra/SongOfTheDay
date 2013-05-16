@@ -21,6 +21,8 @@ public class WidgetModel {
 	public static final String ACTION_UPDATE = "ru.vang.songoftheday.ACTION_UPDATE";
 	public static final String ACTION_ADD = "ru.vang.songoftheday.ACTION_ADD";
 	public static final String ACTION_CANCEL = "ru.vang.songoftheday.ACTION_CANCEL";
+	public static final String ACTION_NO_VK_ACCOUNT = "ru.vang.songoftheday.ACTION_NO_VK_ACCOUNT";
+
 	public static final String EXTRA_ORIGINAL_ARTIST = "ru.vang.songoftheday.originalArtsist";
 	public static final String EXTRA_ORIGINAL_TITLE = "ru.vang.songoftheday.originalTitle";
 	public static final String EXTRA_ARTIST = "ru.vang.songoftheday.artsist";
@@ -48,6 +50,15 @@ public class WidgetModel {
 		final PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0,
 				intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		mRemoteViews.setOnClickPendingIntent(R.id.add, pendingIntent);
+	}
+
+	public void bindNoVkAccount() {
+		final Intent intent = new Intent(mContext, SongOfTheDayWidget.class);
+		intent.setAction(ACTION_NO_VK_ACCOUNT);
+		final PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0,
+				intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		mRemoteViews.setOnClickPendingIntent(R.id.add, pendingIntent);
+		mRemoteViews.setOnClickPendingIntent(R.id.play, pendingIntent);
 	}
 
 	public void bindUpdate() {
@@ -159,7 +170,7 @@ public class WidgetModel {
 
 	public void showProgressBar() {
 		mRemoteViews.setViewVisibility(R.id.progressbar_container, View.VISIBLE);
-		mRemoteViews.setViewVisibility(R.id.details_container, View.GONE);		
+		mRemoteViews.setViewVisibility(R.id.details_container, View.GONE);
 	}
 
 	public void finishUpdate() {
@@ -169,7 +180,7 @@ public class WidgetModel {
 
 	public void hideProgressBar() {
 		mRemoteViews.setViewVisibility(R.id.progressbar_container, View.GONE);
-		mRemoteViews.setViewVisibility(R.id.details_container, View.VISIBLE);		
+		mRemoteViews.setViewVisibility(R.id.details_container, View.VISIBLE);
 	}
 
 	public void setWidgetText(final int primaryTextResId, final int secondaryTextResId) {

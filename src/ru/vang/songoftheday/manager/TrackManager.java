@@ -8,17 +8,14 @@ import java.util.Random;
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 
-import ru.vang.songoftheday.SongOfTheDaySettings;
 import ru.vang.songoftheday.api.LastFM;
 import ru.vang.songoftheday.api.Track;
 import ru.vang.songoftheday.api.Vk;
 import ru.vang.songoftheday.api.VkTrack;
 import ru.vang.songoftheday.database.SongOfTheDayDbHelper;
 import ru.vang.songoftheday.exceptions.VkApiException;
-import ru.vang.songoftheday.fragment.AuthFragment;
 import ru.vang.songoftheday.model.WidgetUpdateInfo;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.provider.MediaStore.Audio.Media;
 
@@ -89,9 +86,9 @@ public class TrackManager {
 		return foundTrack;
 	}
 
-	public void findTopTrackInfo(final WidgetUpdateInfo widgetInfo) throws VkApiException,
-			ClientProtocolException, IOException, JSONException {		
-		final boolean hasVkAccount = hasVkAccount();
+	public void findTopTrackInfo(final WidgetUpdateInfo widgetInfo)
+			throws VkApiException, ClientProtocolException, IOException, JSONException {
+		final boolean hasVkAccount = Vk.hasVkAccount(mContext);
 		widgetInfo.setHasVkAccount(hasVkAccount);
 		VkTrack vkTrack = null;
 		Track track = null;
@@ -109,9 +106,10 @@ public class TrackManager {
 		}
 	}
 
-	public void findSimilarTrackInfo(final Cursor cursor, final WidgetUpdateInfo widgetInfo)
-			throws VkApiException, ClientProtocolException, IOException, JSONException {		
-		final boolean hasVkAccount = hasVkAccount();
+	public void findSimilarTrackInfo(final Cursor cursor,
+			final WidgetUpdateInfo widgetInfo) throws VkApiException,
+			ClientProtocolException, IOException, JSONException {
+		final boolean hasVkAccount = Vk.hasVkAccount(mContext);
 		widgetInfo.setHasVkAccount(hasVkAccount);
 		VkTrack vkTrack = null;
 		Track track = null;
@@ -124,9 +122,11 @@ public class TrackManager {
 			widgetInfo.setOriginalArtist(originalArtist);
 			widgetInfo.setOriginalTitle(originalTitle);
 			track = getLastFmTrack(originalArtist, originalTitle);
-			if (track != null && hasVkAccount) {
+			if (track != null) {
 				widgetInfo.setTrack(track);
-				vkTrack = getVkTrack(track.getArtist(), track.getTitle());
+				if (hasVkAccount) {
+					vkTrack = getVkTrack(track.getArtist(), track.getTitle());
+				}
 			}
 			if (vkTrack != null || (track != null && !hasVkAccount)) {
 				break;
@@ -143,16 +143,7 @@ public class TrackManager {
 
 	private Random getRandom() {
 		return new Random(System.currentTimeMillis());
-	}
-
-	private boolean hasVkAccount() {
-		final SharedPreferences preferences = mContext.getSharedPreferences(
-				SongOfTheDaySettings.SHARED_PREF_NAME, Context.MODE_PRIVATE);
-		final int status = preferences.getInt(SongOfTheDaySettings.PREF_KEY_AUTH_STATUS,
-				AuthFragment.STATUS_COMPLETED);
-		final boolean hasVkAccount = status == AuthFragment.STATUS_COMPLETED;
-		return hasVkAccount;
-	}
+	}	
 
 	private int[] shuffleIndexes(final int length) {
 		final int[] indexes = new int[length];

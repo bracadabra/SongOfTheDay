@@ -20,6 +20,7 @@ import org.scribe.oauth.OAuthService;
 
 import ru.vang.songoftheday.SongOfTheDaySettings;
 import ru.vang.songoftheday.exceptions.VkApiException;
+import ru.vang.songoftheday.fragment.AuthFragment;
 import ru.vang.songoftheday.util.Logger;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -104,6 +105,15 @@ public class Vk {
 		return preferences.edit()
 				.putString(SongOfTheDaySettings.PREF_KEY_TOKEN, token.getToken())
 				.commit();
+	}
+
+	public static boolean hasVkAccount(final Context context) {
+		final SharedPreferences preferences = context.getSharedPreferences(
+				SongOfTheDaySettings.SHARED_PREF_NAME, Context.MODE_PRIVATE);
+		final int status = preferences.getInt(SongOfTheDaySettings.PREF_KEY_AUTH_STATUS,
+				AuthFragment.STATUS_COMPLETED);
+		final boolean hasVkAccount = status == AuthFragment.STATUS_COMPLETED;
+		return hasVkAccount;
 	}
 
 	private static Token getToken(final Context context) throws ClientProtocolException,

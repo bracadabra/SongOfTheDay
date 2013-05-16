@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.widget.Toast;
 
 public class SongOfTheDayWidget extends AppWidgetProvider {
 	private static final String TAG = SongOfTheDayWidget.class.getSimpleName();
@@ -38,6 +39,9 @@ public class SongOfTheDayWidget extends AppWidgetProvider {
 			final Intent stopServiceIntent = new Intent(context,
 					ThrottleUpdateService.class);
 			context.stopService(stopServiceIntent);
+		} else if (WidgetModel.ACTION_NO_VK_ACCOUNT.equals(action)) {
+			Toast.makeText(context, R.string.toast_no_vk_account, Toast.LENGTH_LONG)
+					.show();
 		}
 	}
 

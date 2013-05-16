@@ -23,6 +23,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 public class AuthFragment extends Fragment {
+	public static final String EXTRA_HIDE_SKIP_BUTTON = "ru.vang.songoftheday.EXTRA_HIDE_SKIP_BUTTON";
 	public static final int STATUS_COMPLETED = 0;
 	public static final int STATUS_SKIPED = -1;
 	public static final int STATUS_INCOMPLETED = -2;
@@ -30,7 +31,7 @@ public class AuthFragment extends Fragment {
 	private static final String CALLBACK_LINK = "http://api.vk.com/blank.html";
 	private static final String PERMISSIONS = "audio,offline";
 	private static final String CODE_NAME = "code";
-
+	
 	private AuthTask mAuthTask;
 	private WebView mWebView;
 	private transient OAuthService mAuthSevice;
@@ -51,8 +52,13 @@ public class AuthFragment extends Fragment {
 		public void onAuthFinish(int status);
 	}
 
-	public static AuthFragment newInstance() {
-		return new AuthFragment();
+	public static AuthFragment newInstance(final boolean hideSkipButton) {
+		final AuthFragment fragment = new AuthFragment();
+		final Bundle args = new Bundle(1);
+		args.putBoolean(EXTRA_HIDE_SKIP_BUTTON, hideSkipButton);
+		fragment.setArguments(args);
+
+		return fragment;
 	}
 
 	@Override
@@ -69,18 +75,22 @@ public class AuthFragment extends Fragment {
 		setRetainInstance(true);
 
 		mAuthSevice = new ServiceBuilder().provider(VkontakteApi.class)
-				.apiKey(Vk.CLIENT_ID).apiSecret(Vk.API_SECRET).scope(PERMISSIONS)
-				.callback(CALLBACK_LINK).build();
+				.apiKey(Vk.CLIENT_ID).apiSecret(Vk.API_SECRET)
+				.scope(PERMISSIONS).callback(CALLBACK_LINK).build();
 	}
 
 	@Override
-	public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-			final Bundle savedInstanceState) {
+	public View onCreateView(final LayoutInflater inflater,
+			final ViewGroup container, final Bundle savedInstanceState) {
 		final View view = inflater.inflate(R.layout.vk_auth, container, false);
 		mWebView = (WebView) view.findViewById(R.id.web_view);
 		setupWebView(mWebView);
-		final View skipButton = view.findViewById(R.id.skip);
-		skipButton.setOnClickListener(mSkipClickListener);
+		final View skipButton = view.findViewById(R.id.skip);		
+		if (getArguments().getBoolean(EXTRA_HIDE_SKIP_BUTTON, false)) {
+			skipButton.findViewById(R.id.skip).setVisibility(View.GONE);
+		} else {
+			skipButton.setOnClickListener(mSkipClickListener);
+		}
 
 		return view;
 	}
@@ -111,7 +121,8 @@ public class AuthFragment extends Fragment {
 	}
 
 	public boolean isAuthDone() {
-		return mAuthTask != null && mAuthTask.getStatus() == AsyncTask.Status.FINISHED;
+		return mAuthTask != null
+				&& mAuthTask.getStatus() == AsyncTask.Status.FINISHED;
 	}
 
 	private void setupWebView(final WebView webView) {
@@ -145,10 +156,11 @@ public class AuthFragment extends Fragment {
 
 		@Override
 		protected Void doInBackground(final String... urls) {
-			final String code = StringUtils.extractValueFromUrl(urls[URL_INDEX],
-					CODE_NAME);
+			final String code = StringUtils.extractValueFromUrl(
+					urls[URL_INDEX], CODE_NAME);
 			final Verifier verifier = new Verifier(code);
-			final Token accessToken = mAuthSevice.getAccessToken(null, verifier);
+			final Token accessToken = mAuthSevice
+					.getAccessToken(null, verifier);
 			Vk.saveToken(getActivity().getApplicationContext(), accessToken);
 
 			return null;

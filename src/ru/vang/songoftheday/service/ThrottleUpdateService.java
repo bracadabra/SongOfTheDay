@@ -209,17 +209,18 @@ public class ThrottleUpdateService extends Service {
 			} else {
 				widget.setWidgetText(widgetInfo.getTitle(), widgetInfo.getArtist());
 				final VkTrack vkTrack = widgetInfo.getVkTrack();
-				if (vkTrack != null) {
+				if (vkTrack == null) {
+					if (!widgetInfo.hasVkAccount()) {
+						widget.bindNoVkAccount();
+					}
+				} else {
 					widget.bindPlay(vkTrack);
 					widget.bindAdd(vkTrack.getId(), vkTrack.getOwnerId());
-					if (widgetInfo.isOriginalEmpty()) {
-						widget.hideInfo();
-					} else {
-						widget.bindInfo(widgetInfo.getOriginalArtist(),
-								widgetInfo.getOriginalTitle(), vkTrack.getArtist(),
-								vkTrack.getTitle());
-						widget.showInfo();
-					}
+				}
+				if (!widgetInfo.isOriginalEmpty()) {
+					widget.bindInfo(widgetInfo.getOriginalArtist(),
+							widgetInfo.getOriginalTitle(), widgetInfo.getArtist(),
+							widgetInfo.getTitle());
 				}
 			}
 		} catch (ClientProtocolException e) {

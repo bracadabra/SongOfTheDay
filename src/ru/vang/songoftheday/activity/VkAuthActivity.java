@@ -22,7 +22,8 @@ import android.view.Window;
 
 public class VkAuthActivity extends FragmentActivity implements
 		OnProgressChangedListener, OnAuthFinishListener {
-	private static final String TAG_AUTH_FRAGMENT = AuthFragment.class.getCanonicalName();
+	private static final String TAG_AUTH_FRAGMENT = AuthFragment.class
+			.getCanonicalName();
 
 	private transient int mAppWidgetId;
 
@@ -31,8 +32,10 @@ public class VkAuthActivity extends FragmentActivity implements
 		getWindow().requestFeature(Window.FEATURE_PROGRESS);
 		setResult(RESULT_CANCELED);
 		if (!AvailabilityUtils.isConnectionAvailable(getApplicationContext())) {
-			final DialogFragment errorDialog = NetworkUnavailableDialog.newInstance();
-			errorDialog.show(getSupportFragmentManager(), NetworkUnavailableDialog.TAG);
+			final DialogFragment errorDialog = NetworkUnavailableDialog
+					.newInstance();
+			errorDialog.show(getSupportFragmentManager(),
+					NetworkUnavailableDialog.TAG);
 			return;
 		}
 
@@ -44,7 +47,9 @@ public class VkAuthActivity extends FragmentActivity implements
 		if (savedInstanceState == null) {
 			getSupportFragmentManager()
 					.beginTransaction()
-					.add(android.R.id.content, AuthFragment.newInstance(),
+					.add(android.R.id.content,
+							AuthFragment.newInstance(extras
+									.getBoolean(AuthFragment.EXTRA_HIDE_SKIP_BUTTON)),
 							TAG_AUTH_FRAGMENT).commit();
 		} else {
 			final AuthFragment fragment = (AuthFragment) getSupportFragmentManager()
@@ -77,7 +82,8 @@ public class VkAuthActivity extends FragmentActivity implements
 
 		if (mAppWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
 			final Intent resultValue = new Intent();
-			resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+			resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
+					mAppWidgetId);
 			setResult(RESULT_OK, resultValue);
 		}
 
@@ -85,7 +91,8 @@ public class VkAuthActivity extends FragmentActivity implements
 	}
 
 	public static class NetworkUnavailableDialog extends DialogFragment {
-		public static final String TAG = NetworkUnavailableDialog.class.getSimpleName();
+		public static final String TAG = NetworkUnavailableDialog.class
+				.getSimpleName();
 
 		public static NetworkUnavailableDialog newInstance() {
 			return new NetworkUnavailableDialog();
@@ -93,13 +100,15 @@ public class VkAuthActivity extends FragmentActivity implements
 
 		@Override
 		public Dialog onCreateDialog(final Bundle savedInstanceState) {
-			final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+			final AlertDialog.Builder builder = new AlertDialog.Builder(
+					getActivity());
 			builder.setTitle(R.string.error_dialog_title);
 			builder.setMessage(R.string.network_unavailable_dialog_message);
 			builder.setPositiveButton(android.R.string.ok,
 					new DialogInterface.OnClickListener() {
 
-						public void onClick(final DialogInterface dialog, final int which) {
+						public void onClick(final DialogInterface dialog,
+								final int which) {
 							getActivity().finish();
 						}
 					});
