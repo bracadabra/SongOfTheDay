@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <ListPreference
-        android:defaultValue="@string/wifi_value"
+        android:defaultValue="@string/any_value"
         android:entries="@array/connectivity_entries"
         android:entryValues="@array/connectivity_values"
         android:key="@string/key_network_type"
@@ -18,9 +18,6 @@
         android:enabled="false"
         android:title="@string/title_update_token"
         android:key="@string/key_update_token" >
-        <intent
-            android:targetClass="ru.vang.songoftheday.activity.VkAuthActivity"
-            android:targetPackage="ru.vang.songoftheday" />
     </PreferenceScreen>
 
 </PreferenceScreen>

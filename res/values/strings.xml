@@ -4,8 +4,8 @@
     <string name="app_name">Song Of The Day</string>
     <string name="not_found">Ничего не нашлось :(</string>
     <string name="downloading_started">Песня дня загружается&#8230;</string>
-    <string name="toast_add">Загрузка завершена</string>
-    <string name="toast_no_vk_account">требуется авторизация вконтакте</string>
+    <string name="toast_add">Песня добавлена в аудиозаписи</string>
+    <string name="toast_no_vk_account">Требуется авторизация вконтакте</string>
     <string name="song_playing">Скоро заиграет музыка</string>
     <string name="error_dialog_title">Ошибка</string>
 
@@ -80,7 +80,7 @@
     <string name="sdcard_missing_title">SD карта отсутствует</string>
     <string name="sdcard_missing_title_nosdcard">USB память отсутствует</string>
     <string name="toast_error">Неизвестная ошибка</string>
-    <string name="authorization_failed_title">Ошибка авторизации Вконтакте</string>
+    <string name="authorization_failed_title">Ошибка авторизации</string>
     <string name="update_token">Обновити токен в настройках</string>
 
 </resources>

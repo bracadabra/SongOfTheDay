@@ -14,7 +14,7 @@ import android.util.Log;
 public class Logger {
 	private static final StringBuffer STRING_BUFFER = new StringBuffer();
 	public static final UncaughtExceptionHandler EXCEPTION_HANDLER = new ExceptionHandler();
-	private static final int LOG_LEVEL = Log.VERBOSE;
+	private static final int LOG_LEVEL = Log.ERROR;
 	private static final boolean WRITE_TO_FILE = true;
 
 	public static void append(final String log) {

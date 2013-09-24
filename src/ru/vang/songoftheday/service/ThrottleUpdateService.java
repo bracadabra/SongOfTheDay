@@ -184,6 +184,9 @@ public class ThrottleUpdateService extends Service {
 			manager.findTopTrackInfo(widgetInfo);
 		} else {
 			manager.findSimilarTrackInfo(cursor, widgetInfo);
+			/*if (widgetInfo.getTrack() == null) {
+				manager.findTopTrackInfo(widgetInfo);
+			}*/
 		}
 		if (cursor != null) {
 			cursor.close();

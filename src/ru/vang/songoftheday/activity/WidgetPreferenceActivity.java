@@ -27,18 +27,20 @@ public class WidgetPreferenceActivity extends PreferenceActivity {
 				.setSharedPreferencesName(SongOfTheDaySettings.SHARED_PREF_NAME);
 		addPreferencesFromResource(R.xml.preferences);
 		final Intent intent = getIntent();
+		
+		final Intent authIntent = new Intent(this, VkAuthActivity.class);
+		authIntent.putExtra(AuthFragment.EXTRA_HIDE_SKIP_BUTTON, true);
 		if (Vk.hasVkAccount(this)) {
 			if (intent.hasExtra(EXTRA_ENABLE_UPDATE_TOKEN)) {
 				final Preference updateTokenPreference = prefenceManager
 						.findPreference(getString(R.string.key_update_token));
+				updateTokenPreference.setIntent(authIntent);
 				updateTokenPreference.setEnabled(intent.getBooleanExtra(
 						EXTRA_ENABLE_UPDATE_TOKEN, false));
 			}
 		} else {
 			mAddAccountPreference = prefenceManager
-					.createPreferenceScreen(this);
-			final Intent authIntent = new Intent(this, VkAuthActivity.class);
-			authIntent.putExtra(AuthFragment.EXTRA_HIDE_SKIP_BUTTON, true);
+					.createPreferenceScreen(this);			
 			mAddAccountPreference.setIntent(authIntent);
 			mAddAccountPreference.setKey(getString(R.string.key_add_account));
 			mAddAccountPreference.setTitle(R.string.title_add_account);
