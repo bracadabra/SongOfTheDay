@@ -46,7 +46,6 @@
                 android:resource="@xml/widget_info" />
         </receiver>
 
-        <service android:name=".UpdateService" />
         <service android:name="ru.vang.songoftheday.service.ThrottleUpdateService" />
         <service android:name="ru.vang.songoftheday.service.MediaPlayerService" />
     </application>
