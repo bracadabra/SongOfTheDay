@@ -1,11 +1,5 @@
 package ru.vang.songoftheday;
 
-import ru.vang.songoftheday.fragment.AuthFragment;
-import ru.vang.songoftheday.model.WidgetModel;
-import ru.vang.songoftheday.service.ThrottleUpdateService;
-import ru.vang.songoftheday.util.AlarmHelper;
-import ru.vang.songoftheday.util.Logger;
-
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
@@ -14,6 +8,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.widget.Toast;
+
+import ru.vang.songoftheday.fragment.AuthFragment;
+import ru.vang.songoftheday.model.WidgetModel;
+import ru.vang.songoftheday.service.ThrottleUpdateService;
+import ru.vang.songoftheday.util.AlarmHelper;
+import ru.vang.songoftheday.util.Logger;
 
 public class SongOfTheDayWidget extends AppWidgetProvider {
 
@@ -61,7 +61,7 @@ public class SongOfTheDayWidget extends AppWidgetProvider {
         final Editor editor = preferences.edit();
         editor.putInt(SongOfTheDaySettings.PREF_KEY_AUTH_STATUS,
                 AuthFragment.STATUS_INCOMPLETED);
-        editor.apply();
+        editor.commit();
         // Logger.deleteLog();
     }
 }
