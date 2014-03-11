@@ -5,91 +5,97 @@ import ru.vang.songoftheday.api.VkTrack;
 
 public class WidgetUpdateInfo {
 
-	private String mOriginalTitle;
-	private String mOriginalArtist;
-	private VkTrack mVkTrack;
-	private Track mLastFmTrack;
-	private Status mStatus = Status.SUCCESS;
-	private boolean mHasVkAccount;
-	private boolean mAuthorizationFailed;
+    private String mOriginalTitle;
 
-	public String getOriginalTitle() {
-		return mOriginalTitle;
-	}
+    private String mOriginalArtist;
 
-	public void setOriginalTitle(String originalTitle) {
-		this.mOriginalTitle = originalTitle;
-	}
+    private VkTrack mVkTrack;
 
-	public String getOriginalArtist() {
-		return mOriginalArtist;
-	}
+    private Track mLastFmTrack;
 
-	public void setOriginalArtist(String originalArtist) {
-		this.mOriginalArtist = originalArtist;
-	}
+    private Status mStatus = Status.SUCCESS;
 
-	public VkTrack getVkTrack() {
-		return mVkTrack;
-	}
+    private boolean mHasVkAccount;
 
-	public void setVkTrack(VkTrack vkTrack) {
-		this.mVkTrack = vkTrack;
-	}
+    private boolean mAuthorizationFailed;
 
-	public void setPath(final String path) {
-		mVkTrack.setPath(path);
-	}
+    public String getOriginalTitle() {
+        return mOriginalTitle;
+    }
 
-	public void setStatus(final Status status) {
-		mStatus = status;
-	}
+    public void setOriginalTitle(String originalTitle) {
+        this.mOriginalTitle = originalTitle;
+    }
 
-	public Status getStatus() {
-		return mStatus;
-	}
+    public String getOriginalArtist() {
+        return mOriginalArtist;
+    }
 
-	public boolean isCancelled() {
-		return mStatus == Status.CANCELLED;
-	}
+    public void setOriginalArtist(String originalArtist) {
+        this.mOriginalArtist = originalArtist;
+    }
 
-	public void setTrack(final Track track) {
-		mLastFmTrack = track;
-	}
+    public VkTrack getVkTrack() {
+        return mVkTrack;
+    }
 
-	public Track getTrack() {
-		return mLastFmTrack;
-	}
+    public void setVkTrack(VkTrack vkTrack) {
+        this.mVkTrack = vkTrack;
+    }
 
-	public String getTitle() {
-		return mLastFmTrack.getTitle();
-	}
+    public void setPath(final String path) {
+        mVkTrack.setPath(path);
+    }
 
-	public String getArtist() {
-		return mLastFmTrack.getArtist();
-	}
+    public void setStatus(final Status status) {
+        mStatus = status;
+    }
 
-	public void setHasVkAccount(final boolean hasVkAccount) {
-		mHasVkAccount = hasVkAccount;
-	}
+    public Status getStatus() {
+        return mStatus;
+    }
 
-	public boolean hasVkAccount() {
-		return mHasVkAccount;
-	}
+    public boolean isCancelled() {
+        return mStatus == Status.CANCELLED;
+    }
 
-	public boolean isOriginalEmpty() {
-		return mOriginalTitle == null || mOriginalArtist == null;
-	}
+    public void setTrack(final Track track) {
+        mLastFmTrack = track;
+    }
 
-	public void setAuthorizationFailed(final boolean status) {
-		mAuthorizationFailed = status;
-	}
+    public Track getTrack() {
+        return mLastFmTrack;
+    }
 
-	public boolean isAuthorizationFailed() {
-		return mAuthorizationFailed;
-	}
+    public String getTitle() {
+        return mLastFmTrack.getTitle();
+    }
 
-	public static enum Status {
-		SUCCESS, CANCELLED
-	}
+    public String getArtist() {
+        return mLastFmTrack.getArtist();
+    }
+
+    public void setHasVkAccount(final boolean hasVkAccount) {
+        mHasVkAccount = hasVkAccount;
+    }
+
+    public boolean hasVkAccount() {
+        return mHasVkAccount;
+    }
+
+    public boolean isOriginalEmpty() {
+        return mOriginalTitle == null || mOriginalArtist == null;
+    }
+
+    public void setAuthorizationFailed(final boolean status) {
+        mAuthorizationFailed = status;
+    }
+
+    public boolean isAuthorizationFailed() {
+        return mAuthorizationFailed;
+    }
+
+    public static enum Status {
+        SUCCESS, CANCELLED
+    }
 }

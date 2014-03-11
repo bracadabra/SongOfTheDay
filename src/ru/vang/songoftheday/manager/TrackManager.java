@@ -1,12 +1,16 @@
 package ru.vang.songoftheday.manager;
 
+import org.apache.http.client.ClientProtocolException;
+import org.json.JSONException;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.provider.MediaStore.Audio.Media;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
-import org.apache.http.client.ClientProtocolException;
-import org.json.JSONException;
 
 import ru.vang.songoftheday.api.LastFM;
 import ru.vang.songoftheday.api.Track;
@@ -15,9 +19,6 @@ import ru.vang.songoftheday.api.VkTrack;
 import ru.vang.songoftheday.database.SongOfTheDayDbHelper;
 import ru.vang.songoftheday.exceptions.VkApiException;
 import ru.vang.songoftheday.model.WidgetUpdateInfo;
-import android.content.Context;
-import android.database.Cursor;
-import android.provider.MediaStore.Audio.Media;
 
 public class TrackManager {
 	public static final String[] MEDIA_PROJECTION = { Media._ID, Media.ARTIST,
@@ -74,8 +75,7 @@ public class TrackManager {
 	}
 
 	private boolean ifSameArtist(final String originalArtist, final String foundArtist) {
-		return originalArtist != null && originalArtist.equals(foundArtist) ? true
-				: false;
+		return originalArtist != null && originalArtist.equals(foundArtist);
 	}
 
 	public Track getLastFmTrack(final String artist, final String title)
