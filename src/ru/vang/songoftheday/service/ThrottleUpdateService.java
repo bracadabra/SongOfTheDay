@@ -58,6 +58,7 @@ public class ThrottleUpdateService extends Service {
 
     private boolean mRedelivery;
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onStart(final Intent intent, final int startId) {
         if (mSemaphore.availablePermits() > 0) {
@@ -87,8 +88,8 @@ public class ThrottleUpdateService extends Service {
                 SongOfTheDaySettings.SHARED_PREF_NAME, Context.MODE_PRIVATE);
         final int status = sharedPreferences.getInt(
                 SongOfTheDaySettings.PREF_KEY_AUTH_STATUS,
-                AuthFragment.STATUS_INCOMPLETED);
-        if (status == AuthFragment.STATUS_INCOMPLETED) {
+                AuthFragment.STATUS_INCOMPLETE);
+        if (status == AuthFragment.STATUS_INCOMPLETE) {
             Logger.debug(TAG, "Update was skipped.");
             return;
         }
@@ -183,7 +184,7 @@ public class ThrottleUpdateService extends Service {
     }
 
     private void fetchUpdate(final WidgetUpdateInfo widgetInfo)
-            throws ClientProtocolException, IOException, JSONException, VkApiException {
+            throws IOException, JSONException, VkApiException {
         final Cursor cursor = getContentResolver().query(Media.EXTERNAL_CONTENT_URI,
                 TrackManager.MEDIA_PROJECTION, AUDIO_SELECTION, null, null);
         final TrackManager manager = new TrackManager(getApplicationContext());
@@ -204,7 +205,7 @@ public class ThrottleUpdateService extends Service {
     }
 
     private void downloadTrack(final WidgetUpdateInfo widgetInfo)
-            throws ClientProtocolException, IOException {
+            throws IOException {
         mDownloadProgressListener = new DownloadProgressListener(getApplicationContext(),
                 widgetInfo);
         DownloadHelper.downloadTo(widgetInfo, getExternalCacheDir(),
@@ -268,7 +269,7 @@ public class ThrottleUpdateService extends Service {
         }
 
         public void run() {
-            Toast.makeText(getApplicationContext(), mStringId, Toast.LENGTH_SHORT).show();
+            Toast.makeText(ThrottleUpdateService.this, mStringId, Toast.LENGTH_SHORT).show();
         }
     }
 }

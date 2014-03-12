@@ -1,6 +1,5 @@
 package ru.vang.songoftheday.api;
 
-import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,7 +14,6 @@ import org.scribe.oauth.OAuthService;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -41,12 +39,12 @@ public class Vk {
 
     private static final String ADD_AUDIO = CORE + "audio.add?aid=%s&oid=%s";
 
-    private transient final OAuthService mAuthSevice;
+    private transient final OAuthService mAuthService;
 
     private transient final Token mToken;
 
-    public Vk(final Context context) throws ClientProtocolException, IOException {
-        mAuthSevice = new ServiceBuilder().provider(VkontakteApi.class).apiKey(CLIENT_ID)
+    public Vk(final Context context) {
+        mAuthService = new ServiceBuilder().provider(VkontakteApi.class).apiKey(CLIENT_ID)
                 .apiSecret(API_SECRET).build();
         mToken = getToken(context);
         Logger.debug(TAG, "Token: " + mToken.toString());
@@ -59,7 +57,7 @@ public class Vk {
                 URLEncoder.encode(artist, SongOfTheDaySettings.DEFAULT_CHARSET),
                 URLEncoder.encode(title, SongOfTheDaySettings.DEFAULT_CHARSET)));
         Logger.debug(TAG, "audio.search: " + request.getUrl());
-        mAuthSevice.signRequest(mToken, request);
+        mAuthService.signRequest(mToken, request);
         final Response response = request.send();
         if (response.getCode() != 200) {
             throw new VkApiException("Failed to search audio! code: "
@@ -85,7 +83,7 @@ public class Vk {
             VkApiException {
         final OAuthRequest request = new OAuthRequest(Verb.GET, String.format(ADD_AUDIO,
                 aid, oid));
-        mAuthSevice.signRequest(mToken, request);
+        mAuthService.signRequest(mToken, request);
         final Response response = request.send();
         if (response.getCode() != 200) {
             throw new VkApiException("Failed to add audio");
@@ -119,11 +117,11 @@ public class Vk {
         final int status = preferences.getInt(SongOfTheDaySettings.PREF_KEY_AUTH_STATUS,
                 AuthFragment.STATUS_COMPLETED);
         final boolean hasVkAccount = status == AuthFragment.STATUS_COMPLETED;
+
         return hasVkAccount;
     }
 
-    private static Token getToken(final Context context) throws ClientProtocolException,
-            IOException {
+    private static Token getToken(final Context context) {
         final SharedPreferences preferences = context.getSharedPreferences(
                 SongOfTheDaySettings.SHARED_PREF_NAME, Context.MODE_PRIVATE);
         final String tokenStr = preferences.getString(

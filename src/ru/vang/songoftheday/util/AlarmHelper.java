@@ -1,12 +1,5 @@
 package ru.vang.songoftheday.util;
 
-import java.util.Calendar;
-
-import ru.vang.songoftheday.R;
-import ru.vang.songoftheday.SongOfTheDaySettings;
-import ru.vang.songoftheday.SongOfTheDayWidget;
-import ru.vang.songoftheday.preference.TimePreference;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -14,6 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.text.format.DateFormat;
+
+import java.util.Calendar;
+
+import ru.vang.songoftheday.R;
+import ru.vang.songoftheday.SongOfTheDaySettings;
+import ru.vang.songoftheday.SongOfTheDayWidget;
+import ru.vang.songoftheday.preference.TimePreference;
 
 public final class AlarmHelper {
 
@@ -32,7 +32,7 @@ public final class AlarmHelper {
         setAlarm(context, calendar);
     }
 
-    public static void setAlaram(final Context context, final int hours, final int minutes) {
+    public static void setAlarm(final Context context, final int hours, final int minutes) {
         final Calendar calendar = Calendar.getInstance();
         setUpdateTime(calendar, hours, minutes);
         setAlarm(context, calendar);
@@ -56,7 +56,7 @@ public final class AlarmHelper {
         );
     }
 
-    public static void cancelAlaram(final Context context) {
+    public static void cancelAlarm(final Context context) {
         final PendingIntent alarmIntent = createAlarmIntent(context);
         final AlarmManager alarmManager = (AlarmManager) context
                 .getSystemService(Context.ALARM_SERVICE);
@@ -65,8 +65,8 @@ public final class AlarmHelper {
 
     public static void resetAlarm(final Context context, final int hours,
             final int minutes) {
-        cancelAlaram(context);
-        setAlaram(context, hours, minutes);
+        cancelAlarm(context);
+        setAlarm(context, hours, minutes);
     }
 
     private static void setUpdateTimeFromPreferences(final Context context,

@@ -11,9 +11,9 @@ public enum VkErrors {
     PARAMETER_MISSING(100, R.string.parameter_missing),
     ACCESS_DENIED(201, R.string.access_denied);
 
-    private int mCode;
+    private final int mCode;
 
-    private int mMessageId;
+    private final int mMessageId;
 
     VkErrors(final int code, final int messageId) {
         mCode = code;

@@ -25,8 +25,8 @@ public class WidgetPreferenceActivity extends PreferenceActivity {
     @SuppressWarnings("deprecation")
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final PreferenceManager prefenceManager = getPreferenceManager();
-        prefenceManager
+        final PreferenceManager preferenceManager = getPreferenceManager();
+        preferenceManager
                 .setSharedPreferencesName(SongOfTheDaySettings.SHARED_PREF_NAME);
         addPreferencesFromResource(R.xml.preferences);
         final Intent intent = getIntent();
@@ -35,14 +35,14 @@ public class WidgetPreferenceActivity extends PreferenceActivity {
         authIntent.putExtra(AuthFragment.EXTRA_HIDE_SKIP_BUTTON, true);
         if (Vk.hasVkAccount(this)) {
             if (intent.hasExtra(EXTRA_ENABLE_UPDATE_TOKEN)) {
-                final Preference updateTokenPreference = prefenceManager
+                final Preference updateTokenPreference = preferenceManager
                         .findPreference(getString(R.string.key_update_token));
                 updateTokenPreference.setIntent(authIntent);
                 updateTokenPreference.setEnabled(intent.getBooleanExtra(
                         EXTRA_ENABLE_UPDATE_TOKEN, false));
             }
         } else {
-            mAddAccountPreference = prefenceManager
+            mAddAccountPreference = preferenceManager
                     .createPreferenceScreen(this);
             mAddAccountPreference.setIntent(authIntent);
             mAddAccountPreference.setKey(getString(R.string.key_add_account));
@@ -50,7 +50,7 @@ public class WidgetPreferenceActivity extends PreferenceActivity {
             getPreferenceScreen().addPreference(mAddAccountPreference);
         }
 
-        final TimePreference timePreference = (TimePreference) prefenceManager
+        final TimePreference timePreference = (TimePreference) preferenceManager
                 .findPreference(getString(R.string.key_time));
         timePreference
                 .setOnPreferenceChangeListener(new OnPreferenceChangeListener() {

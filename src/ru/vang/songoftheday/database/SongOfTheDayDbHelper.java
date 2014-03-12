@@ -43,6 +43,10 @@ public class SongOfTheDayDbHelper extends SQLiteOpenHelper {
 
     public void insertMbid(final String mbid) {
         final SQLiteDatabase db = getWritableDatabase();
+        if (db == null) {
+            return;
+        }
+
         final ContentValues cv = new ContentValues(COLUMNS_COUNT);
         cv.put(COLUMN_NAME_MBID, mbid);
         db.insert(TABLE_NAME, null, cv);
@@ -52,8 +56,12 @@ public class SongOfTheDayDbHelper extends SQLiteOpenHelper {
 
     public boolean ifMbidExists(final String mbid) {
         final SQLiteDatabase db = getWritableDatabase();
+        if (db == null) {
+            return false;
+        }
+
         final Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_MBID + "=?",
-                new String[]{COLUMN_NAME_MBID}, null, null, null);
+                new String[]{mbid}, null, null, null);
         boolean exists = false;
         if (cursor != null) {
             exists = cursor.getCount() > 0;

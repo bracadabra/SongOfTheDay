@@ -47,8 +47,8 @@ public class VkAuthActivity extends FragmentActivity implements
                     AppWidgetManager.INVALID_APPWIDGET_ID);
         }
         if (savedInstanceState == null) {
-            final boolean hideSkip = extras == null ? true : extras
-                    .getBoolean(AuthFragment.EXTRA_HIDE_SKIP_BUTTON);
+            final boolean hideSkip = extras == null || extras.getBoolean(
+                    AuthFragment.EXTRA_HIDE_SKIP_BUTTON);
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(android.R.id.content,

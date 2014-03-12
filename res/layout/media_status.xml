@@ -9,8 +9,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="15dip"
-        android:layout_marginRight="15dip"
+        android:layout_marginLeft="16dip"
+        android:layout_marginRight="16dip"
+        android:contentDescription="@string/desc_stop_playing"
         android:src="@drawable/ic_media_stop" />
 
     <LinearLayout
@@ -27,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fadingEdge="horizontal"
-            android:fadingEdgeLength="7dip"
+            android:fadingEdgeLength="8dip"
             android:gravity="center_vertical"           
             android:textAppearance="@style/NotificationTitle" />
 
@@ -36,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fadingEdge="horizontal"
-            android:fadingEdgeLength="7dip"
+            android:fadingEdgeLength="8dip"
             android:singleLine="true"          
             android:textAppearance="@style/NotificationText" />
     </LinearLayout>

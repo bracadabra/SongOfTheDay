@@ -55,7 +55,7 @@ public class MediaPlayerService extends Service implements OnPreparedListener,
         final String action = intent.getAction();
         Logger.debug(TAG, "MediaPlayerService has received action: " + action);
         boolean isPlaying = STOP_PLAYING;
-        if (action.equals(ACTION_PLAY)) {
+        if (ACTION_PLAY.equals(action)) {
             final Uri uri = intent.getData();
             Logger.debug(TAG, "Data with uri " + uri + " is started to play");
             mMediaPlayer = new MediaPlayer();
@@ -79,7 +79,7 @@ public class MediaPlayerService extends Service implements OnPreparedListener,
             stopPlayer();
             stopSelf();
         }
-        mWidget.tooglePlay(getApplicationContext(), intent, isPlaying);
+        mWidget.tooglePlay(intent, isPlaying);
 
         return START_NOT_STICKY;
     }
@@ -118,14 +118,14 @@ public class MediaPlayerService extends Service implements OnPreparedListener,
         final Intent contentIntent = intent;
         contentIntent.setAction(ACTION_STOP);
         final PendingIntent pendingStopIntent = PendingIntent.getService(
-                getApplicationContext(), 0, contentIntent, 0);
+                MediaPlayerService.this, 0, contentIntent, 0);
         builder.setContentIntent(pendingStopIntent);
 
         final RemoteViews contentView = new RemoteViews(getApplicationContext()
                 .getPackageName(), R.layout.media_status);
-        final String artist = intent.getStringExtra(WidgetModel.EXTRA_ARTIST);
+        final String artist = contentIntent.getStringExtra(WidgetModel.EXTRA_ARTIST);
         contentView.setTextViewText(R.id.artist, artist);
-        final String title = intent.getStringExtra(WidgetModel.EXTRA_TITLE);
+        final String title = contentIntent.getStringExtra(WidgetModel.EXTRA_TITLE);
         contentView.setTextViewText(R.id.title, title);
         builder.setContent(contentView);
 
@@ -144,6 +144,6 @@ public class MediaPlayerService extends Service implements OnPreparedListener,
         if (mMediaPlayer != null) {
             mMediaPlayer.release();
         }
-        mWidget.tooglePlay(getApplicationContext(), mIntent, STOP_PLAYING);
+        mWidget.tooglePlay(mIntent, STOP_PLAYING);
     }
 }

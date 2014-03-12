@@ -1,8 +1,5 @@
 package ru.vang.songoftheday.util;
 
-import ru.vang.songoftheday.R;
-import ru.vang.songoftheday.SongOfTheDaySettings;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -10,6 +7,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
 import android.util.Log;
+
+import ru.vang.songoftheday.R;
+import ru.vang.songoftheday.SongOfTheDaySettings;
 
 public final class AvailabilityUtils {
 

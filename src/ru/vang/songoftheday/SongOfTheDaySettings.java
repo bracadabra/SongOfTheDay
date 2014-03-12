@@ -7,8 +7,6 @@ public final class SongOfTheDaySettings {
     private SongOfTheDaySettings() {
     }
 
-    ;
-
     public static final String LOG_FILE = "songoftheday.log";
 
     public static final String SHARED_PREF_NAME = "songoftheday";

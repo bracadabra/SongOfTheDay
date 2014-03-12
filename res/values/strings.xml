@@ -20,6 +20,7 @@
     <string name="desc_divider">Divider</string>
     <string name="desc_info">Widget Info</string>
     <string name="desc_download_icon">Download icon</string>
+    <string name="desc_stop_playing">Stop playback</string>
 
     <!-- Preferences -->
     <string name="key_network_type">network_key</string>

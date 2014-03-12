@@ -1,7 +1,5 @@
 package ru.vang.songoftheday.network;
 
-import org.apache.http.client.ClientProtocolException;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,8 +18,7 @@ public final class DownloadHelper {
     }
 
     public static void downloadTo(final WidgetUpdateInfo widgetInfo, final File path,
-            final ProgressListener progressListener) throws ClientProtocolException,
-            IOException {
+            final ProgressListener progressListener) throws IOException {
         final VkTrack vkTrack = widgetInfo.getVkTrack();
         final URL requestUrl = new URL(vkTrack.getUrl());
         final HttpURLConnection connection = (HttpURLConnection) requestUrl

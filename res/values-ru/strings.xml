@@ -20,6 +20,7 @@
     <string name="desc_divider">Разделитель</string>
     <string name="desc_info">Информация о виджете</string>
     <string name="desc_download_icon">Иконка загрузки</string>
+    <string name="desc_stop_playing">Остановить воспроизведение</string>
 
     <!-- Preferences -->
     <string name="key_network_type">network_key</string>

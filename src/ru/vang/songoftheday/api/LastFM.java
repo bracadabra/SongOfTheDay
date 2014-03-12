@@ -1,7 +1,5 @@
 package ru.vang.songoftheday.api;
 
-import org.apache.http.client.ClientProtocolException;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -36,19 +34,19 @@ public final class LastFM {
     }
 
     public static List<Track> getSimilarTracks(final String artist, final String title)
-            throws ClientProtocolException, IOException {
+            throws IOException {
         final String url = String.format(GET_SIMILAR,
                 URLEncoder.encode(artist, SongOfTheDaySettings.DEFAULT_CHARSET),
                 URLEncoder.encode(title, SongOfTheDaySettings.DEFAULT_CHARSET));
         return makeRequest(url, "similartracks");
     }
 
-    public static List<Track> getTopTracks() throws ClientProtocolException, IOException {
+    public static List<Track> getTopTracks() throws IOException {
         return makeRequest(GET_TOP_TRACKS, "tracks");
     }
 
     private static List<Track> makeRequest(final String url, final String root)
-            throws ClientProtocolException, IOException {
+            throws IOException {
         Logger.debug(TAG, "Requested url: " + url);
         final URL requestUrl = new URL(url);
         final HttpURLConnection connection = (HttpURLConnection) requestUrl

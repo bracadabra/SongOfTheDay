@@ -33,7 +33,7 @@ public class SongOfTheDayWidget extends AppWidgetProvider {
         super.onReceive(context, intent);
 
         final String action = intent.getAction();
-        Logger.debug(TAG, "Action " + action + " is recieved");
+        Logger.debug(TAG, "Action " + action + " is received");
         if (WidgetModel.ACTION_ADD.equals(action)) {
             intent.setComponent(new ComponentName(context, ThrottleUpdateService.class));
             context.startService(intent);
@@ -52,15 +52,15 @@ public class SongOfTheDayWidget extends AppWidgetProvider {
         Logger.debug(TAG, "onDisabled is called");
         super.onDisabled(context);
         context.stopService(new Intent(context, ThrottleUpdateService.class));
-        AlarmHelper.cancelAlaram(context);
+        AlarmHelper.cancelAlarm(context);
 
-        // Currently multiple instances isn't supported, thats why set completed
+        // Currently multiple instances isn't supported, that's why set completed
         // flag here
         final SharedPreferences preferences = context.getSharedPreferences(
                 SongOfTheDaySettings.SHARED_PREF_NAME, Context.MODE_PRIVATE);
         final Editor editor = preferences.edit();
         editor.putInt(SongOfTheDaySettings.PREF_KEY_AUTH_STATUS,
-                AuthFragment.STATUS_INCOMPLETED);
+                AuthFragment.STATUS_INCOMPLETE);
         editor.commit();
         // Logger.deleteLog();
     }

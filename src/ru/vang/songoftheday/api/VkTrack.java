@@ -95,6 +95,22 @@ public class VkTrack extends Track {
         }
 
         final VkTrack other = (VkTrack) object;
+        if (mId == null) {
+            if (other.mId != null) {
+                return false;
+            }
+        } else if (!mId.equals(other.mId)) {
+            return false;
+        }
+
+        if (mOwnerId == null) {
+            if (other.mOwnerId != null) {
+                return false;
+            }
+        } else if (!mOwnerId.equals(other.mOwnerId)) {
+            return false;
+        }
+
         if (mTitle == null) {
             if (other.mTitle != null) {
                 return false;
@@ -108,14 +124,6 @@ public class VkTrack extends Track {
                 return false;
             }
         } else if (!mArtist.equals(other.mArtist)) {
-            return false;
-        }
-
-        if (mId != other.mId) {
-            return false;
-        }
-
-        if (mOwnerId != other.mOwnerId) {
             return false;
         }
 
@@ -145,7 +153,7 @@ public class VkTrack extends Track {
         result = SEED * result + ((mArtist == null) ? 0 : mArtist.hashCode());
         result = SEED * result + String.valueOf(mId).hashCode();
         result = SEED * result + ((mPath == null) ? 0 : mPath.hashCode());
-        result = SEED * result + ((mUrl == null) ? 0 : mPath.hashCode());
+        result = SEED * result + ((mUrl == null) ? 0 : mUrl.hashCode());
         result = SEED * result + String.valueOf(mOwnerId).hashCode();
 
         return result;

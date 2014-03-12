@@ -5,7 +5,7 @@ import ru.vang.songoftheday.R;
 public enum LastFmErrors {
     INVALID_SERVICE(2, R.string.invalid_service),
     INVALID_METHOD(3, R.string.invalid_method),
-    AUTHENTIFICATION_FAILED(4, R.string.last_fm_authentication_failed),
+    AUTHENTICATION_FAILED(4, R.string.last_fm_authentication_failed),
     INVALID_FORMAT(5, R.string.invalid_format),
     INVALID_PARAMETERS(6, R.string.invalid_parameters),
     INVALID_RESOURCE(7, R.string.invalid_resource),
@@ -22,9 +22,9 @@ public enum LastFmErrors {
 
     private final int mMessageId;
 
-    LastFmErrors(final int code, final int messsageId) {
+    LastFmErrors(final int code, final int messageId) {
         mCode = code;
-        mMessageId = messsageId;
+        mMessageId = messageId;
     }
 
     public int getCode() {
@@ -42,7 +42,7 @@ public enum LastFmErrors {
             case 3:
                 return INVALID_METHOD;
             case 4:
-                return AUTHENTIFICATION_FAILED;
+                return AUTHENTICATION_FAILED;
             case 5:
                 return INVALID_FORMAT;
             case 6:

@@ -67,7 +67,7 @@ public class TimePreference extends DialogPreference {
 
     @Override
     protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
-        String time = null;
+        final String time;
         if (restoreValue) {
             if (defaultValue == null) {
                 time = getPersistedString(SongOfTheDaySettings.DEFAULT_UPDATE_TIME);
@@ -91,6 +91,7 @@ public class TimePreference extends DialogPreference {
     public static int[] parseTime(final String time) {
         final String[] parts = time.split(DELIMITER, 2);
         final int[] timeParts = {Integer.valueOf(parts[0]), Integer.valueOf(parts[1])};
+
         return timeParts;
     }
 

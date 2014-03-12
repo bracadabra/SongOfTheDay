@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -23,6 +22,7 @@ import ru.vang.songoftheday.R;
 import ru.vang.songoftheday.api.Vk;
 import ru.vang.songoftheday.util.StringUtils;
 
+//TODO use vk sdk
 public class AuthFragment extends Fragment {
 
     public static final String EXTRA_HIDE_SKIP_BUTTON
@@ -30,9 +30,9 @@ public class AuthFragment extends Fragment {
 
     public static final int STATUS_COMPLETED = 0;
 
-    public static final int STATUS_SKIPED = -1;
+    public static final int STATUS_SKIPPED = -1;
 
-    public static final int STATUS_INCOMPLETED = -2;
+    public static final int STATUS_INCOMPLETE = -2;
 
     private static final String CALLBACK_LINK = "http://api.vk.com/blank.html";
 
@@ -46,10 +46,10 @@ public class AuthFragment extends Fragment {
 
     private transient OAuthService mAuthSevice;
 
-    private OnClickListener mSkipClickListener = new OnClickListener() {
+    private final OnClickListener mSkipClickListener = new OnClickListener() {
 
         public void onClick(final View view) {
-            mOnAuthFinishListener.onAuthFinish(STATUS_SKIPED);
+            mOnAuthFinishListener.onAuthFinish(STATUS_SKIPPED);
         }
     };
 
@@ -162,8 +162,6 @@ public class AuthFragment extends Fragment {
                 return false;
             }
         });
-        final WebSettings webSettings = webView.getSettings();
-        webSettings.setSavePassword(false);
     }
 
     private class AuthTask extends AsyncTask<String, Void, Void> {
