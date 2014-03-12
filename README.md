@@ -7,8 +7,6 @@ Tired of looking for new music? No problem. App widget will save  your effort by
 Application
 ------
 
-A sample can be found on Google Play:
-
 <a href="https://play.google.com/store/apps/details?id=ru.vang.songoftheday">
   <img alt="Get it on Google Play"
        src="http://www.android.com/images/brand/get_it_on_play_logo_small.png" />
